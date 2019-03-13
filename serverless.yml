@@ -1,0 +1,16 @@
+service: cvs-tsk-cert-gov-notify
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+
+plugins:
+  - serverless-plugin-typescript
+
+functions:
+  main:
+    handler: src/handler.handler
+    events:
+    - s3:
+        bucket: cvs-signature
+        event: s3:ObjectCreated:Put
