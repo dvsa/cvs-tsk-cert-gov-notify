@@ -10,8 +10,10 @@ class Configuration {
     private static instance: Configuration;
     private readonly config: any;
 
-    private constructor(configPath: string) {
+    private constructor(configPath: string, secretsPath: string) {
         const config = yml.readSync(configPath);
+        const secrets = yml.readSync(secretsPath);
+        config.mot.api_key = secrets.mot.api_key;
 
         // Replace environment variable references
         let stringifiedConfig: string = JSON.stringify(config);
@@ -37,7 +39,7 @@ class Configuration {
      */
     public static getInstance(): Configuration {
         if (!this.instance) {
-            this.instance = new Configuration("../config/config.yml");
+            this.instance = new Configuration("../config/config.yml", "../config/secrets.yml");
         }
 
         return Configuration.instance;

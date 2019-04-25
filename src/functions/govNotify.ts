@@ -3,7 +3,6 @@ import {ManagedUpload} from "aws-sdk/clients/s3";
 import {CertificateDownloadService} from "../services/CertificateDownloadService";
 import {Injector} from "../models/injector/Injector";
 import {NotificationService} from "../services/NotificationService";
-
 /**
  * λ function to process an SQS record and initialise email notifications for generated certificates
  * @param event - SQS event
