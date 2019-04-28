@@ -2,6 +2,7 @@ import {Configuration} from "../utils/Configuration";
 import {S3BucketService} from "./S3BucketService";
 import {Service} from "../models/injector/ServiceDecorator";
 import S3 from "aws-sdk/clients/s3";
+import {S3BucketMockService} from "../../tests/models/S3BucketMockService";
 
 
 /**
@@ -39,7 +40,9 @@ class CertificateDownloadService {
                 email: result.Metadata!["x-amz-meta-email"],
                 certificate: result.Body
             };
-        });
+        }).catch((error) => {
+                console.error(error);
+            });
     }
 
 }

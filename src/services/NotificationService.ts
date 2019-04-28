@@ -1,21 +1,23 @@
 // @ts-ignore
 import {NotifyClient} from "notifications-node-client";
 import {Service} from "../models/injector/ServiceDecorator";
-import {Configuration} from "../utils/Configuration";
-import {IMOTConfig} from "../models";
+import {NotifyClientMock} from "../../tests/models/NotifyClientMock";
 
+/**
+ * Service class for Certificate Notifications
+ */
 @Service()
 class NotificationService {
-    private readonly notifyClient: NotifyClient;
-    private readonly config: Configuration;
-    private readonly motConfig: IMOTConfig;
+    private readonly notifyClient: NotifyClient | NotifyClientMock;
 
-    constructor() {
-        this.config = Configuration.getInstance();
-        this.motConfig = this.config.getMOTConfig();
-        this.notifyClient = new NotifyClient(this.motConfig.api_key);
+    constructor(notifyClient: NotifyClient | NotifyClientMock) {
+        this.notifyClient = notifyClient;
     }
 
+    /**
+     * Sending email with the certificate according to the given params
+     * @param params - personalization details,email and certificate
+     */
     public sendNotification(params: any) {
         const emailDetails = {
             personalisation: {
@@ -26,7 +28,7 @@ class NotificationService {
 
         return this.notifyClient.sendEmail("1b602e0e-b53a-452a-858f-c5831ef3ed70", params.email, emailDetails)
         .then((response: any) => {
-            console.log(response.body);
+            return response;
         })
         .catch((err: any) => {
             console.error(err);

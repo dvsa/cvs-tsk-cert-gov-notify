@@ -16,6 +16,7 @@ interface IBucket {
  */
 class S3BucketMockService {
     public static buckets: IBucket[] = [];
+    public static metadata: any;
 
     /**
      * Uploads a file to an S3 bucket
@@ -108,13 +109,13 @@ class S3BucketMockService {
         }
 
         // @ts-ignore
-        const file: Buffer = fs.readFileSync(path.resolve(__dirname, `../resources/signatures/${bucketKey}`));
+        const file: Buffer = fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/${bucketKey}`));
         const data: S3.Types.GetObjectOutput = {
             Body: file,
             ContentLength: file.length,
             ETag: "621c9c14d75958d4c3ed8ad77c80cde1",
             LastModified: new Date(),
-            Metadata: {}
+            Metadata: S3BucketMockService.metadata
         };
 
         const response = new Response<S3.Types.GetObjectOutput, AWSError>();

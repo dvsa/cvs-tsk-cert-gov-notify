@@ -2,7 +2,7 @@
   "extends": "tslint:recommended",
   "rules": {
     "max-line-length": {
-      "options": [240]
+      "options": [1000]
     },
     "new-parens": false,
     "no-arg": true,
