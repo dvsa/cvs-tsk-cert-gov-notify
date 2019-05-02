@@ -2,6 +2,7 @@
 import {NotifyClient} from "notifications-node-client";
 import {Service} from "../models/injector/ServiceDecorator";
 import {NotifyClientMock} from "../../tests/models/NotifyClientMock";
+import {TEMPLATEIDS} from "../assets/enum";
 
 /**
  * Service class for Certificate Notifications
@@ -26,7 +27,8 @@ class NotificationService {
             }
         };
 
-        return this.notifyClient.sendEmail("1b602e0e-b53a-452a-858f-c5831ef3ed70", params.email, emailDetails)
+        console.log(`Sent email using ${TEMPLATEIDS.CertificateEmail} templateId, ${params.test_type_name} test type name and ${params.date_of_issue} date of issue`);
+        return this.notifyClient.sendEmail(TEMPLATEIDS.CertificateEmail, params.email, emailDetails)
         .then((response: any) => {
             return response;
         })

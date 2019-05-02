@@ -1,7 +1,7 @@
 // @ts-ignore
 import * as yml from "node-yaml";
 import {IInvokeConfig, IMOTConfig, IS3Config} from "../models";
-
+import {ERRORS} from "../assets/enum";
 /**
  * Configuration class for retrieving project config
  */
@@ -59,7 +59,7 @@ class Configuration {
      */
     public getInvokeConfig(): IInvokeConfig {
         if (!this.config.invoke) {
-            throw new Error("Lambda Invoke config is not defined in the config file.");
+            throw new Error(ERRORS.LambdaInvokeConfigNotDefined);
         }
 
         // Not defining BRANCH will default to local
@@ -74,7 +74,7 @@ class Configuration {
      */
     public getS3Config(): IS3Config {
         if (!this.config.s3) {
-            throw new Error("DynamoDB config is not defined in the config file.");
+            throw new Error(ERRORS.DynamoDBConfigNotDefined);
         }
 
         // Not defining BRANCH will default to local
@@ -89,7 +89,7 @@ class Configuration {
      */
     public getMOTConfig(): IMOTConfig {
         if (!this.config.mot) {
-            throw new Error("The MOT config is not defined in the config file.");
+            throw new Error(ERRORS.MotConfigNotDefined);
         }
 
         return this.config.mot;
