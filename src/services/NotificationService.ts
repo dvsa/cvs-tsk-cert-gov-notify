@@ -27,7 +27,7 @@ class NotificationService {
             }
         };
 
-        console.log(`Sent email using ${TEMPLATEIDS.CertificateEmail} templateId, ${params.test_type_name} test type name and ${params.date_of_issue} date of issue`);
+        console.log(`Sent email using ${TEMPLATEIDS.CertificateEmail} templateId, ${params.personalisation.test_type_name} test type name and ${params.personalisation.date_of_issue} date of issue`);
         return this.notifyClient.sendEmail(TEMPLATEIDS.CertificateEmail, params.email, emailDetails)
         .then((response: any) => {
             return response;
