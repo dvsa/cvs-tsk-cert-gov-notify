@@ -22,7 +22,7 @@ class CertificateDownloadService {
      * @param fileName - the file name of the certificate you want to download
      */
     public getCertificate(fileName: string) {
-        return this.s3Client.download("cvs-cert", fileName)
+        return this.s3Client.download(`cvs-cert-${process.env.BUCKET}`, fileName)
         .then((result: S3.Types.GetObjectOutput) => {
             return {
                 personalisation: {

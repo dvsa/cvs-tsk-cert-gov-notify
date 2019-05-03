@@ -4,7 +4,7 @@
   "description": "Certificate generation initiation task",
   "main": "handler.js",
   "scripts": {
-    "start": "node_modules/serverless/bin/serverless invoke local -f main --path tests/resources/s3-event.json",
+    "start": "BRANCH=local BUCKET=local node_modules/serverless/bin/serverless invoke local -f main --path tests/resources/s3-event.json",
     "start:docker": "docker-compose -f docker-compose.yml up -d",
     "build": "node_modules/typescript/bin/tsc --rootDir ./ --outDir .build --sourceMap false && npm run build:copy",
     "build:dev": "node_modules/typescript/bin/tsc && npm run build:copy",
