@@ -3,7 +3,7 @@ export enum TEMPLATEIDS {
 }
 
 export enum ERRORS {
-    MotConfigNotDefined = "The MOT config is not defined in the config file.",
+    NotifyConfigNotDefined = "The Notify config is not defined in the config file.",
     DynamoDBConfigNotDefined = "DynamoDB config is not defined in the config file.",
     LambdaInvokeConfigNotDefined = "Lambda Invoke config is not defined in the config file."
 }

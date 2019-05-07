@@ -20,7 +20,7 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
     }
 
     const downloadService: CertificateDownloadService = Injector.resolve<CertificateDownloadService>(CertificateDownloadService);
-    const notifyClient = new NotifyClient(Configuration.getInstance().getMOTConfig().api_key);
+    const notifyClient = new NotifyClient(Configuration.getInstance().getNotifyConfig().api_key);
     const notifyService: NotificationService = new NotificationService(notifyClient);
     const notifyPromises: Array<Promise<any>> = [];
 

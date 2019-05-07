@@ -1,6 +1,6 @@
 // @ts-ignore
 import * as yml from "node-yaml";
-import {IInvokeConfig, IMOTConfig, IS3Config} from "../models";
+import {IInvokeConfig, INotifyConfig, IS3Config} from "../models";
 import {ERRORS} from "../assets/enum";
 /**
  * Configuration class for retrieving project config
@@ -13,7 +13,7 @@ class Configuration {
     private constructor(configPath: string, secretsPath: string) {
         const config = yml.readSync(configPath);
         const secrets = yml.readSync(secretsPath);
-        config.mot.api_key = secrets.mot.api_key;
+        config.notify.api_key = secrets.notify.api_key;
 
         // Replace environment variable references
         let stringifiedConfig: string = JSON.stringify(config);
@@ -85,14 +85,14 @@ class Configuration {
 
     /**
      * Retrieves the MOT config
-     * @returns IMOTConfig
+     * @returns INotifyConfig
      */
-    public getMOTConfig(): IMOTConfig {
-        if (!this.config.mot) {
-            throw new Error(ERRORS.MotConfigNotDefined);
+    public getNotifyConfig(): INotifyConfig {
+        if (!this.config.notify) {
+            throw new Error(ERRORS.NotifyConfigNotDefined);
         }
 
-        return this.config.mot;
+        return this.config.notify;
     }
 
 }
