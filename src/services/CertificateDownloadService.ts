@@ -27,7 +27,7 @@ class CertificateDownloadService {
             console.log(`Downloading result: ${JSON.stringify(result)}`);
             const notifyPartialParams = {
                 personalisation: {
-                    vrms: result.Metadata!["meta-vrm"],
+                    vrms: result.Metadata!.vrm,
                     test_type_name: result.Metadata!["test-type-name"],
                     date_of_issue: result.Metadata!["date-of-issue"],
                     cert_index: result.Metadata!["cert-index"],
