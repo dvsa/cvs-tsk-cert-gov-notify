@@ -46,7 +46,7 @@ class S3BucketService {
         console.log(`Downloading file: bucket name: ${bucketName}, key: ${process.env.BRANCH}/${fileName}`);
         return this.s3Client.getObject({
             Bucket: bucketName,
-            Key: `${process.env.BRANCH}/${fileName}`,
+            Key: `${fileName}`,
         }).promise();
     }
 }
