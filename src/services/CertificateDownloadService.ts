@@ -39,7 +39,7 @@ class CertificateDownloadService {
                 email: result.Metadata!["x-amz-meta-email"],
                 certificate: result.Body
             };
-             console.log(`Notify partial params: ${notifyPartialParams}`);
+             console.log(`Notify partial params: ${JSON.stringify(notifyPartialParams)}`);
              return notifyPartialParams;
         }).catch((error) => {
                 console.error(error);
