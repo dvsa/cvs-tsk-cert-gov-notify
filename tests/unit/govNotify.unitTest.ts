@@ -6,7 +6,7 @@ import {handler} from "../../src/handler";
 describe("gov-notify", () => {
     context("handler", () => {
         context("when the request is valid", () => {
-            it("response should resolve ", () => {
+            it("response should resolve ", (done) => {
                 // @ts-ignore
                 return lambdaTester(handler)
                     .event({
@@ -14,7 +14,7 @@ describe("gov-notify", () => {
                             {
                                 messageId: "e982f6d5-750b-4a51-a970-1c28069264f1",
                                 receiptHandle: "AQEBDmMTvZ3clvltGoZSOHzwdYPXfCrWcpGUvDBgaq2E7tzL4/c5gfEzihpKb01ZRCnL2ovPZyDctFVWySBvxCs+jpnqQV9UkT+rev2iF6pQHFeVIfVtAKMWhAN4v2Xq1DocTMwOeOjhcD5HJZV0n1Ubojp8TQ2zO/dr0IAigkwSEEAN+edaoRZZfciC/xQa22mhWwqrpqeIY14xFesqAH7vGiTUz5vO1rqM/pNV1QdgT68imIokF5v2WtAsRv3PJ3RXhMAbDiVeSHMcvEEsXDDrjwP3MGW+ft8RUsITrLsCMbViZ5b2NQUrem7mwM71yUlidrPvwZWjoGqin5S99SjYaPZhHoq5BKLY+WSy1vx2QzP8Q2BwcsmcYiAbW86HOHFBkS009GPwDm7Yw88Uy/MVMQ==",
-                                body: "{\"Records\":[{\"eventVersion\":\"2.1\",\"eventSource\":\"aws:s3\",\"awsRegion\":\"eu-west-2\",\"eventTime\":\"2019-03-11T17:25:49.423Z\",\"eventName\":\"ObjectCreated:Put\",\"userIdentity\":{\"principalId\":\"AWS:AROAI6VHAEV7JDO4TV7SW:cvs-tsk-cert-gen\"},\"requestParameters\":{\"sourceIPAddress\":\"35.177.22.7\"},\"responseElements\":{\"x-amz-request-id\":\"E3EC1ADCF9837A04\",\"x-amz-id-2\":\"94WFwtqptVMLLnjxdYEnZTk6Ckvxd/kc955n6FobhewQnZLaa6j2mYsN5FhAXAK5GMCEAYMTw5s=\"},\"s3\":{\"s3SchemaVersion\":\"1.0\",\"configurationId\":\"NewCertificateEvent\",\"bucket\":{\"name\":\"cvs-cert\",\"ownerIdentity\":{\"principalId\":\"A1MIGBS2LU0NRP\"},\"arn\":\"arn:aws:s3:::cvs-cert\"},\"object\":{\"key\":\"1_1B7GG36N12S678410_1.pdf\",\"size\":306696,\"eTag\":\"eb29a2eaf5c2cfc08beb9158dc9fec1a\",\"sequencer\":\"005C869A1D5F16042D\"}}}]}",
+                                body: "{\"Records\":[{\"eventVersion\":\"2.1\",\"eventSource\":\"aws:s3\",\"awsRegion\":\"eu-west-2\",\"eventTime\":\"2019-03-11T17:25:49.423Z\",\"eventName\":\"ObjectCreated:Put\",\"userIdentity\":{\"principalId\":\"AWS:AROAI6VHAEV7JDO4TV7SW:cvs-tsk-cert-gen\"},\"requestParameters\":{\"sourceIPAddress\":\"35.177.22.7\"},\"responseElements\":{\"x-amz-request-id\":\"E3EC1ADCF9837A04\",\"x-amz-id-2\":\"94WFwtqptVMLLnjxdYEnZTk6Ckvxd/kc955n6FobhewQnZLaa6j2mYsN5FhAXAK5GMCEAYMTw5s=\"},\"s3\":{\"s3SchemaVersion\":\"1.0\",\"configurationId\":\"NewCertificateEvent\",\"bucket\":{\"name\":\"cvs-cert-local\",\"ownerIdentity\":{\"principalId\":\"A1MIGBS2LU0NRP\"},\"arn\":\"arn:aws:s3:::cvs-cert\"},\"object\":{\"key\":\"1_1B7GG36N12S678410_1.pdf\",\"size\":306696,\"eTag\":\"eb29a2eaf5c2cfc08beb9158dc9fec1a\",\"sequencer\":\"005C869A1D5F16042D\"}}}]}",
                                 attributes: {
                                     ApproximateReceiveCount: "1",
                                     SentTimestamp: "1552325149579",
@@ -37,17 +37,19 @@ describe("gov-notify", () => {
                                 subject: "BQ91YHQ Annual test|11 March 2019 (Certificate 1 of 2)"
                             });
                         });
+                done();
                     });
             });
 
         context("when the request is not valid", () => {
-            it("response should reject ", () => {
+            it("response should reject ", (done) => {
                 // @ts-ignore
                 return lambdaTester(handler)
                     .event(undefined)
                     .expectResolve((result) => {
                        expect(result).to.be.eql(undefined);
                     });
+                done();
                     });
             });
         });
