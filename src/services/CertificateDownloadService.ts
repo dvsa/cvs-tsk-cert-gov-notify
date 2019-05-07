@@ -27,17 +27,17 @@ class CertificateDownloadService {
             console.log(`Downloading result: ${JSON.stringify(result)}`);
             const notifyPartialParams = {
                 personalisation: {
-                    vrms: result.Metadata!["x-amz-meta-vrm"],
-                    test_type_name: result.Metadata!["x-amz-meta-test-type-name"],
-                    date_of_issue: result.Metadata!["x-amz-meta-date-of-issue"],
-                    cert_index: result.Metadata!["x-amz-meta-cert-index"],
-                    total_certs: result.Metadata!["x-amz-meta-total-certs"],
-                    test_type_result: result.Metadata!["x-amz-meta-test-type-result"],
-                    cert_type: result.Metadata!["x-amz-meta-cert-type"],
-                    file_format: result.Metadata!["x-amz-meta-file-format"],
-                    file_size: result.Metadata!["x-amz-meta-file-size"]
+                    vrms: result.Metadata!["meta-vrm"],
+                    test_type_name: result.Metadata!["test-type-name"],
+                    date_of_issue: result.Metadata!["date-of-issue"],
+                    cert_index: result.Metadata!["cert-index"],
+                    total_certs: result.Metadata!["total-certs"],
+                    test_type_result: result.Metadata!["test-type-result"],
+                    cert_type: result.Metadata!["cert-type"],
+                    file_format: result.Metadata!["file-format"],
+                    file_size: result.Metadata!["file-size"]
                 },
-                email: result.Metadata!["x-amz-meta-email"],
+                email: result.Metadata!.email,
                 certificate: result.Body
             };
             console.log(`Notify partial params: ${JSON.stringify(notifyPartialParams)}`);
