@@ -31,8 +31,8 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
             const s3Object: any = s3Record.s3.object;
 
             const notifyPromise = downloadService.getCertificate(s3Object.key)
-            .then((result: any) => {
-                return notifyService.sendNotification(result);
+            .then((notifyPartialParams: any) => {
+                return notifyService.sendNotification(notifyPartialParams);
             });
 
             notifyPromises.push(notifyPromise);

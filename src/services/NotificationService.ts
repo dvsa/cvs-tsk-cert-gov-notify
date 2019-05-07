@@ -19,16 +19,16 @@ class NotificationService {
      * Sending email with the certificate according to the given params
      * @param params - personalization details,email and certificate
      */
-    public sendNotification(params: any) {
+    public sendNotification(notifyPartialParams: any) {
         const emailDetails = {
             personalisation: {
-                ...params.personalisation,
-                link_to_document: this.notifyClient.prepareUpload(params.certificate)
+                ...notifyPartialParams.personalisation,
+                link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.certificate)
             }
         };
 
-        console.log(`Sent email using ${TEMPLATEIDS.CertificateEmail} templateId, ${params.personalisation.test_type_name} test type name and ${params.personalisation.date_of_issue} date of issue`);
-        return this.notifyClient.sendEmail(TEMPLATEIDS.CertificateEmail, params.email, emailDetails)
+        console.log(`Sent email using ${TEMPLATEIDS.CertificateEmail} templateId, ${notifyPartialParams.personalisation.test_type_name} test type name and ${notifyPartialParams.personalisation.date_of_issue} date of issue`);
+        return this.notifyClient.sendEmail(TEMPLATEIDS.CertificateEmail, notifyPartialParams.email, emailDetails)
         .then((response: any) => {
             return response;
         })

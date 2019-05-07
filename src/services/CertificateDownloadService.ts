@@ -24,7 +24,7 @@ class CertificateDownloadService {
     public getCertificate(fileName: string) {
         return this.s3Client.download(`cvs-cert-${process.env.BUCKET}`, fileName)
         .then((result: S3.Types.GetObjectOutput) => {
-            return {
+             const notifyPartialParams = {
                 personalisation: {
                     vrms: result.Metadata!["x-amz-meta-vrm"],
                     test_type_name: result.Metadata!["x-amz-meta-test-type-name"],
@@ -39,6 +39,8 @@ class CertificateDownloadService {
                 email: result.Metadata!["x-amz-meta-email"],
                 certificate: result.Body
             };
+             console.log(`Notify partial params: ${notifyPartialParams}`);
+             return notifyPartialParams;
         }).catch((error) => {
                 console.error(error);
             });
