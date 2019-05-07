@@ -43,6 +43,7 @@ class S3BucketService {
      * @param fileName - the name of the file
      */
     public download(bucketName: string, fileName: string): Promise<PromiseResult<S3.Types.GetObjectOutput, AWSError>> {
+        console.log(`Downloading file: bucket name: ${bucketName}, key: ${process.env.BRANCH}/${fileName}`);
         return this.s3Client.getObject({
             Bucket: bucketName,
             Key: `${process.env.BRANCH}/${fileName}`,
