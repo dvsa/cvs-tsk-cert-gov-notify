@@ -3,9 +3,18 @@ service: cvs-tsk-cert-gov-notify
 provider:
   name: aws
   runtime: nodejs8.10
+  tracing: true # enable tracing
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "xray:PutTraceSegments"
+        - "xray:PutTelemetryRecords"
+      Resource:
+        - "*"
 
 plugins:
   - serverless-plugin-typescript
+  - serverless-plugin-tracing
 
 functions:
   main:
