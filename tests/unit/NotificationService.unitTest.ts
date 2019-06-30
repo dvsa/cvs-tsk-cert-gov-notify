@@ -7,8 +7,6 @@ import {CertificateDownloadService} from "../../src/services/CertificateDownload
 import {S3BucketMockService} from "../models/S3BucketMockService";
 import {NotificationService} from "../../src/services/NotificationService";
 import {NotifyClientMock} from "../models/NotifyClientMock";
-import {Configuration} from "../../src/utils/Configuration";
-import {IS3Config} from "../../../cvs-tsk-retro-gen/src/models";
 
 describe("gov-notify", () => {
     const certificateDownloadService: CertificateDownloadService = Injector.resolve<CertificateDownloadService>(CertificateDownloadService, [S3BucketMockService]);
@@ -52,6 +50,8 @@ describe("gov-notify", () => {
             certificateDownloadService.getCertificate("1_1B7GG36N12S678410_1.base64")
                 .then((response) => {
                     expect(response).to.eql(expectedResponse);
+            }).catch(() => {
+                expect.fail();
             });
             });
         });
@@ -107,41 +107,10 @@ describe("gov-notify", () => {
             notificationService.sendNotification(params)
                 .then((response: any) => {
                     expect(response).to.eql(expectedResponseBody);
-                });
+                }).catch(() => {
+                    expect.fail();
+            });
         });
         });
     });
-
-});
-
-
-describe("ConfigurationUtil", () => {
-        const config: Configuration = Configuration.getInstance();
-        const branch = process.env.BRANCH;
-        context("when calling the getS3Config() and the BRANCH environment variable is local", () => {
-            process.env.BRANCH = "local";
-            const s3config: IS3Config = config.getS3Config();
-            it("should return the local S3 config", () => {
-                expect(s3config.endpoint).to.equal("http://localhost:7000");
-            });
-        });
-
-        context("when calling the getS3Config() and the BRANCH environment variable is not defined", () => {
-            process.env.BRANCH = "";
-            const s3config: IS3Config = config.getS3Config();
-            it("should return the local S3 config", () => {
-                expect(s3config.endpoint).to.equal("http://localhost:7000");
-            });
-        });
-
-        context("when calling the getS3Config() and the BRANCH environment variable is different than local", () => {
-            process.env.BRANCH = "test";
-            const s3config: IS3Config = config.getS3Config();
-            it("should return the local S3 config", () => {
-                // tslint:disable-next-line:no-unused-expression
-                expect(s3config).to.be.empty;
-            });
-        });
-
-        process.env.BRANCH = branch;
 });

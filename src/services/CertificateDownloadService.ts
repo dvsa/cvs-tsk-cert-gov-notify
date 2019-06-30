@@ -40,9 +40,7 @@ class CertificateDownloadService {
                 email: result.Metadata!.email,
                 certificate: result.Body
             };
-            const notifyPartialParamsWithoutCertificate = Object.assign({}, notifyPartialParams);
-            delete notifyPartialParamsWithoutCertificate.certificate;
-            console.log(`Notify partial params: ${JSON.stringify(notifyPartialParamsWithoutCertificate)}`);
+            console.log(`Notify partial params: ${JSON.stringify(notifyPartialParams)}`);
             return notifyPartialParams;
         }).catch((error) => {
                 console.error(error);
