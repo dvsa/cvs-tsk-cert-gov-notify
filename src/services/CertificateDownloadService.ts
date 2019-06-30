@@ -2,6 +2,7 @@ import {Configuration} from "../utils/Configuration";
 import {S3BucketService} from "./S3BucketService";
 import {Service} from "../models/injector/ServiceDecorator";
 import S3 from "aws-sdk/clients/s3";
+import {S3BucketMockService} from "../../tests/models/S3BucketMockService";
 
 
 /**
@@ -24,7 +25,6 @@ class CertificateDownloadService {
     public getCertificate(fileName: string) {
         return this.s3Client.download(`cvs-cert-${process.env.BUCKET}`, fileName)
         .then((result: S3.Types.GetObjectOutput) => {
-            console.log(`Downloading result: ${JSON.stringify(result)}`);
             const notifyPartialParams = {
                 personalisation: {
                     vrms: result.Metadata!.vrm,
@@ -40,7 +40,9 @@ class CertificateDownloadService {
                 email: result.Metadata!.email,
                 certificate: result.Body
             };
-            console.log(`Notify partial params: ${JSON.stringify(notifyPartialParams)}`);
+            const notifyPartialParamsWithoutCertificate = Object.assign({}, notifyPartialParams);
+            delete notifyPartialParamsWithoutCertificate.certificate;
+            console.log(`Notify partial params: ${JSON.stringify(notifyPartialParamsWithoutCertificate)}`);
             return notifyPartialParams;
         }).catch((error) => {
                 console.error(error);

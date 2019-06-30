@@ -7,28 +7,32 @@ import {CertificateDownloadService} from "../../src/services/CertificateDownload
 import {S3BucketMockService} from "../models/S3BucketMockService";
 import {NotificationService} from "../../src/services/NotificationService";
 import {NotifyClientMock} from "../models/NotifyClientMock";
+import {Configuration} from "../../src/utils/Configuration";
+import {IS3Config} from "../../../cvs-tsk-retro-gen/src/models";
 
 describe("gov-notify", () => {
+    const certificateDownloadService: CertificateDownloadService = Injector.resolve<CertificateDownloadService>(CertificateDownloadService, [S3BucketMockService]);
+    // const certificateDownloadService: CertificateDownloadService = new CertificateDownloadService(new S3BucketMockService(new S3()));
     S3BucketMockService.buckets.push({
-        bucketName: "cvs-cert",
-        files: ["1_1B7GG36N12S678410_1.base64"]
-    });
+            bucketName: "cvs-cert-local",
+            files: ["1_1B7GG36N12S678410_1.base64"]
+        });
+    S3BucketMockService.metadata = {
+            "cert-type": "PSV_PRS",
+            "date-of-issue": "11 March 2019",
+            "file-format": "pdf",
+            "file-size": "306784",
+            "cert-index": "1",
+            "test-type-name": "Annual test",
+            "test-type-result": "prs",
+            "total-certs": "2",
+            "vrm": "BQ91YHQ",
+            "email": "testemail@testdomain.com"
+        };
     context("CertificateDownloadService", () => {
-        const certificateDownloadService: CertificateDownloadService = Injector.resolve<CertificateDownloadService>(CertificateDownloadService, [S3BucketMockService]);
         context("getCertificate()", () => {
             it("should return apropriate data", () => {
-            S3BucketMockService.metadata = {
-                "x-amz-meta-cert-type": "PSV_PRS",
-                "x-amz-meta-date-of-issue": "11 March 2019",
-                "x-amz-meta-file-format": "pdf",
-                "x-amz-meta-file-size": "306784",
-                "x-amz-meta-cert-index": "1",
-                "x-amz-meta-test-type-name": "Annual test",
-                "x-amz-meta-test-type-result": "prs",
-                "x-amz-meta-total-certs": "2",
-                "x-amz-meta-vrm": "BQ91YHQ",
-                "x-amz-meta-email": "testemail@testdomain.com"
-            };
+
 
             const expectedResponse = {
                     personalisation: {
@@ -108,4 +112,37 @@ describe("gov-notify", () => {
         });
         });
     });
+
+});
+
+
+describe("ConfigurationUtil", () => {
+        const config: Configuration = Configuration.getInstance();
+        const branch = process.env.BRANCH;
+        context("when calling the getS3Config() and the BRANCH environment variable is local", () => {
+            process.env.BRANCH = "local";
+            const s3config: IS3Config = config.getS3Config();
+            it("should return the local S3 config", () => {
+                expect(s3config.endpoint).to.equal("http://localhost:7000");
+            });
+        });
+
+        context("when calling the getS3Config() and the BRANCH environment variable is not defined", () => {
+            process.env.BRANCH = "";
+            const s3config: IS3Config = config.getS3Config();
+            it("should return the local S3 config", () => {
+                expect(s3config.endpoint).to.equal("http://localhost:7000");
+            });
+        });
+
+        context("when calling the getS3Config() and the BRANCH environment variable is different than local", () => {
+            process.env.BRANCH = "test";
+            const s3config: IS3Config = config.getS3Config();
+            it("should return the local S3 config", () => {
+                // tslint:disable-next-line:no-unused-expression
+                expect(s3config).to.be.empty;
+            });
+        });
+
+        process.env.BRANCH = branch;
 });
