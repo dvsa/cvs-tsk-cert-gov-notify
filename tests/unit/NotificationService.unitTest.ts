@@ -50,8 +50,6 @@ describe("gov-notify", () => {
             certificateDownloadService.getCertificate("1_1B7GG36N12S678410_1.base64")
                 .then((response) => {
                     expect(response).to.eql(expectedResponse);
-            }).catch(() => {
-                expect.fail();
             });
             });
         });
@@ -107,8 +105,6 @@ describe("gov-notify", () => {
             notificationService.sendNotification(params)
                 .then((response: any) => {
                     expect(response).to.eql(expectedResponseBody);
-                }).catch(() => {
-                    expect.fail();
             });
         });
         });
