@@ -12,7 +12,6 @@ import {IS3Config} from "../../../cvs-tsk-retro-gen/src/models";
 
 describe("gov-notify", () => {
     const certificateDownloadService: CertificateDownloadService = Injector.resolve<CertificateDownloadService>(CertificateDownloadService, [S3BucketMockService]);
-    // const certificateDownloadService: CertificateDownloadService = new CertificateDownloadService(new S3BucketMockService(new S3()));
     S3BucketMockService.buckets.push({
             bucketName: "cvs-cert-local",
             files: ["1_1B7GG36N12S678410_1.base64"]
