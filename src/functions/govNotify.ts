@@ -33,7 +33,9 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
             const notifyPromise = downloadService.getCertificate(s3Object.key)
             .then((notifyPartialParams: any) => {
                 return notifyService.sendNotification(notifyPartialParams);
-            });
+            }).catch((error) => {
+                    throw error;
+                });
 
             notifyPromises.push(notifyPromise);
         });
@@ -42,6 +44,7 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
     return Promise.all(notifyPromises)
     .catch((error: any) => {
         console.error(error);
+        throw error;
     });
 };
 

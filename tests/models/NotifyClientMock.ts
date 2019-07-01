@@ -1,11 +1,16 @@
 /**
  * Mock class for NotifyClient
  */
+import {bool} from "aws-sdk/clients/signer";
 
+/**
+ * Mock class for NotifyClient
+ */
 class NotifyClientMock {
 
     public static prepareUploadResponseFile: Buffer;
     public static sendEmailResponse: any;
+    public static failFlagSendEmailResponse: bool;
 
     // tslint:disable-next-line:no-empty
     constructor(apiKey: any) {}
@@ -14,7 +19,7 @@ class NotifyClientMock {
      * Mock method for sendEmail. Simulates response for sending email with MOT notification client
      */
     public async sendEmail(templateId: string, destination: string, personalization: any) {
-        return NotifyClientMock.sendEmailResponse;
+        return NotifyClientMock.failFlagSendEmailResponse ? Promise.reject(NotifyClientMock.sendEmailResponse) : Promise.resolve(NotifyClientMock.sendEmailResponse);
     }
 
     /**

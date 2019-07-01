@@ -2,7 +2,7 @@ import {Configuration} from "../utils/Configuration";
 import {S3BucketService} from "./S3BucketService";
 import {Service} from "../models/injector/ServiceDecorator";
 import S3 from "aws-sdk/clients/s3";
-import {S3BucketMockService} from "../../tests/models/S3BucketMockService";
+import {HTTPError} from "../models/HTTPError";
 
 
 /**
@@ -44,6 +44,7 @@ class CertificateDownloadService {
             return notifyPartialParams;
         }).catch((error) => {
                 console.error(error);
+                throw new HTTPError(500, "Server internal error");
             });
     }
 

@@ -7,6 +7,7 @@ import {CertificateDownloadService} from "../../src/services/CertificateDownload
 import {S3BucketMockService} from "../models/S3BucketMockService";
 import {NotificationService} from "../../src/services/NotificationService";
 import {NotifyClientMock} from "../models/NotifyClientMock";
+import {HTTPError} from "../../src/models/HTTPError";
 
 describe("gov-notify", () => {
     const certificateDownloadService: CertificateDownloadService = Injector.resolve<CertificateDownloadService>(CertificateDownloadService, [S3BucketMockService]);
@@ -27,7 +28,7 @@ describe("gov-notify", () => {
             "email": "testemail@testdomain.com"
         };
     context("CertificateDownloadService", () => {
-        context("getCertificate()", () => {
+        context("getCertificate() with valid file name", () => {
             it("should return apropriate data", () => {
 
 
@@ -53,12 +54,21 @@ describe("gov-notify", () => {
             });
             });
         });
+
+        context("getCertificate() with invalid file name", () => {
+            it("should throw error", () => {
+                certificateDownloadService.getCertificate("invalid.base64")
+                    .catch((error) => {
+                        expect(error instanceof HTTPError).to.eql(true);
+                    });
+            });
+        });
     });
 
     context("NotificationService", () => {
         const notifyClient = new NotifyClientMock("random key");
         const notificationService: NotificationService = new NotificationService(notifyClient);
-        context("sendNotification()", () => {
+        context("sendNotification() and notify client responds ok", () => {
             it("should return apropriate data", () => {
             NotifyClientMock.prepareUploadResponseFile = fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/1_1B7GG36N12S678410_1.base64`));
 
@@ -107,6 +117,36 @@ describe("gov-notify", () => {
                     expect(response).to.eql(expectedResponseBody);
             });
         });
+        });
+
+        context("sendNotification() and notify client throws error", () => {
+            it("should throw error", () => {
+                NotifyClientMock.prepareUploadResponseFile = fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/1_1B7GG36N12S678410_1.base64`));
+
+                const params = {
+                    personalisation: {
+                        vrms: "BQ91YHQ",
+                        test_type_name: "Annual test",
+                        date_of_issue: "11 March 2019",
+                        total_certs: "2",
+                        test_type_result: "prs",
+                        cert_type: "PSV_PRS",
+                        file_format: "pdf",
+                        file_size: "306784"
+                    },
+                    email: "testemai@testdomain.com",
+                    certificate: fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/1_1B7GG36N12S678410_1.base64`))
+                };
+
+                NotifyClientMock.failFlagSendEmailResponse = true;
+                NotifyClientMock.sendEmailResponse = new Error("Email failed to be sent");
+
+
+                notificationService.sendNotification(params)
+                    .catch((error: any) => {
+                        expect(error instanceof HTTPError).to.eql(true);
+                    });
+            });
         });
     });
 });
