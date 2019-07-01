@@ -32,8 +32,8 @@ class NotificationService {
             console.log(`Sent email using ${TEMPLATEIDS.CertificateEmail} templateId, ${notifyPartialParams.personalisation.test_type_name} test type name and ${notifyPartialParams.personalisation.date_of_issue} date of issue`);
             return response;
         })
-        .catch((err: any) => {
-            console.error(err);
+        .catch((error: any) => {
+            console.error("Could not send email!", error.message);
             throw new HTTPError(500, "Internal server error");
         });
     }

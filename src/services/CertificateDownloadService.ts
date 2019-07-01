@@ -43,7 +43,7 @@ class CertificateDownloadService {
             console.log(`Notify partial params: ${JSON.stringify(notifyPartialParams)}`);
             return notifyPartialParams;
         }).catch((error) => {
-                console.error(error);
+                console.error(error.message);
                 throw new HTTPError(500, "Server internal error");
             });
     }
