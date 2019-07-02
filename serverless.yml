@@ -19,7 +19,6 @@ plugins:
 functions:
   main:
     handler: src/handler.handler
-    timeout: 15
     events:
     - s3:
         bucket: cvs-signature
