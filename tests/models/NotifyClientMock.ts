@@ -1,7 +1,3 @@
-/**
- * Mock class for NotifyClient
- */
-import {bool} from "aws-sdk/clients/signer";
 
 /**
  * Mock class for NotifyClient
@@ -10,7 +6,7 @@ class NotifyClientMock {
 
     public static prepareUploadResponseFile: Buffer;
     public static sendEmailResponse: any;
-    public static failFlagSendEmailResponse: bool;
+    public static failFlagSendEmailResponse: boolean;
 
     // tslint:disable-next-line:no-empty
     constructor(apiKey: any) {}
