@@ -10,6 +10,9 @@ import {NotifyClientMock} from "../models/NotifyClientMock";
 import {HTTPError} from "../../src/models/HTTPError";
 
 describe("gov-notify", () => {
+    before(function() {
+        this.timeout(10000); // 10 second timeout for setup
+    });
     const certificateDownloadService: CertificateDownloadService = Injector.resolve<CertificateDownloadService>(CertificateDownloadService, [S3BucketMockService]);
     S3BucketMockService.buckets.push({
             bucketName: "cvs-cert-local",
