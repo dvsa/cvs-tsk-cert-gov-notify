@@ -3,10 +3,8 @@ import {expect} from "chai";
 import {Configuration} from "../../src/utils/Configuration";
 import {IS3Config, IInvokeConfig, INotifyConfig} from "../../src/models";
 
-describe("ConfigurationUtil", () => {
-    before(function() {
-        this.timeout(10000); // 10 second timeout for setup
-    });
+describe("ConfigurationUtil", function() {
+    this.timeout(10000); // 10 second timeout for setup
     const config: Configuration = Configuration.getInstance();
     const branch = process.env.BRANCH;
     context("when calling the getS3Config() and the BRANCH environment variable is local", () => {
