@@ -1,7 +1,6 @@
 // @ts-ignore
 import {NotifyClient} from "notifications-node-client";
 import {Service} from "../models/injector/ServiceDecorator";
-import {NotifyClientMock} from "../../tests/models/NotifyClientMock";
 import {TEMPLATEIDS} from "../assets/enum";
 
 /**
@@ -9,9 +8,9 @@ import {TEMPLATEIDS} from "../assets/enum";
  */
 @Service()
 class NotificationService {
-    private readonly notifyClient: NotifyClient | NotifyClientMock;
+    private readonly notifyClient: NotifyClient;
 
-    constructor(notifyClient: NotifyClient | NotifyClientMock) {
+    constructor(notifyClient: NotifyClient) {
         this.notifyClient = notifyClient;
     }
 
@@ -34,6 +33,7 @@ class NotificationService {
         })
         .catch((err: any) => {
             console.error(err);
+            throw err;
         });
     }
 }

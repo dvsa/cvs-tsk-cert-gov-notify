@@ -38,8 +38,8 @@ describe("gov-notify", () => {
                             });
                         });
                 done();
-                    });
             });
+        });
 
         context("when the request is not valid", () => {
             it("response should reject ", (done) => {
@@ -50,7 +50,7 @@ describe("gov-notify", () => {
                        expect(result).to.be.eql(undefined);
                     });
                 done();
-                    });
             });
         });
+    });
 });

@@ -1,65 +1,82 @@
 import {describe} from "mocha";
-import {expect} from "chai";
-import {Injector} from "../../src/models/injector/Injector";
-import * as fs from "fs";
-import * as path from "path";
-import {CertificateDownloadService} from "../../src/services/CertificateDownloadService";
-import {S3BucketMockService} from "../models/S3BucketMockService";
+import chai, {expect} from "chai";
 import {NotificationService} from "../../src/services/NotificationService";
-import {NotifyClientMock} from "../models/NotifyClientMock";
+import sinon from "sinon";
+import sinonChai from "sinon-chai";
+// @ts-ignore
+import {NotifyClient} from "notifications-node-client";
+const sandbox = sinon.createSandbox();
+chai.use(sinonChai);
 
-describe("gov-notify", () => {
-    S3BucketMockService.buckets.push({
-        bucketName: "cvs-cert",
-        files: ["1_1B7GG36N12S678410_1.base64"]
+describe("NotificationService", () => {
+    afterEach(() => {
+        sandbox.restore();
     });
-    context("CertificateDownloadService", () => {
-        const certificateDownloadService: CertificateDownloadService = Injector.resolve<CertificateDownloadService>(CertificateDownloadService, [S3BucketMockService]);
-        context("getCertificate()", () => {
-            it("should return apropriate data", () => {
-            S3BucketMockService.metadata = {
-                "x-amz-meta-cert-type": "PSV_PRS",
-                "x-amz-meta-date-of-issue": "11 March 2019",
-                "x-amz-meta-file-format": "pdf",
-                "x-amz-meta-file-size": "306784",
-                "x-amz-meta-cert-index": "1",
-                "x-amz-meta-test-type-name": "Annual test",
-                "x-amz-meta-test-type-result": "prs",
-                "x-amz-meta-total-certs": "2",
-                "x-amz-meta-vrm": "BQ91YHQ",
-                "x-amz-meta-email": "testemail@testdomain.com"
+
+    context("sendNotification()", () => {
+        it("should return appropriate data", async () => {
+            const prepareUploadFake = sinon.fake.returns("pathToThings");
+            const sendEmailFake = sinon.fake.resolves("it worked");
+            const notifyClientMock = {prepareUpload: prepareUploadFake, sendEmail: sendEmailFake};
+            const notificationService: NotificationService = new NotificationService(notifyClientMock);
+
+            const params = {
+                personalisation: {
+                    vrms: "BQ91YHQ",
+                    test_type_name: "Annual test",
+                    date_of_issue: "11 March 2019",
+                    total_certs: "2",
+                    test_type_result: "prs",
+                    cert_type: "PSV_PRS",
+                    file_format: "pdf",
+                    file_size: "306784"
+                },
+                email: "testemail@testdomain.com",
+                certificate: "certData"
             };
 
-            const expectedResponse = {
-                    personalisation: {
-                        vrms: "BQ91YHQ",
-                        test_type_name: "Annual test",
-                        date_of_issue: "11 March 2019",
-                        total_certs: "2",
-                        test_type_result: "prs",
-                        cert_type: "PSV_PRS",
-                        cert_index: "1",
-                        file_format: "pdf",
-                        file_size: "306784"
-                    },
-                    email: "testemail@testdomain.com",
-                    certificate: fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/1_1B7GG36N12S678410_1.base64`))
-                };
-
-            certificateDownloadService.getCertificate("1_1B7GG36N12S678410_1.base64")
-                .then((response) => {
-                    expect(response).to.eql(expectedResponse);
-            });
-            });
+            try {
+                const resp = await notificationService.sendNotification(params);
+                expect(resp).to.equal("it worked");
+                expect(prepareUploadFake).to.have.been.calledWith(params.certificate);
+            } catch (e) {
+                expect.fail();
+            }
         });
-    });
+        it("should bubble up error if notify client prepareUpload method throws error", async () => {
+            const prepareUploadFake = sinon.fake.throws("preparer: Oh No!");
+            // const sendEmailFake = sinon.fake.resolves("it worked")
+            const notifyClientMock = {prepareUpload: prepareUploadFake, sendEmail: null};
+            const notificationService: NotificationService = new NotificationService(notifyClientMock);
 
-    context("NotificationService", () => {
-        const notifyClient = new NotifyClientMock("random key");
-        const notificationService: NotificationService = new NotificationService(notifyClient);
-        context("sendNotification()", () => {
-            it("should return apropriate data", () => {
-            NotifyClientMock.prepareUploadResponseFile = fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/1_1B7GG36N12S678410_1.base64`));
+            const params = {
+                personalisation: {
+                    vrms: "BQ91YHQ",
+                    test_type_name: "Annual test",
+                    date_of_issue: "11 March 2019",
+                    total_certs: "2",
+                    test_type_result: "prs",
+                    cert_type: "PSV_PRS",
+                    file_format: "pdf",
+                    file_size: "306784"
+                },
+                email: "testemail@testdomain.com",
+                certificate: "certData"
+            };
+
+            try {
+                await notificationService.sendNotification(params);
+                expect.fail();
+            } catch (e) {
+                expect(e.message).to.equal("preparer: Oh No!");
+            }
+
+        });
+        it("should bubble up error if notify client sendEmail method throws error", async () => {
+            const prepareUploadFake = sinon.fake.returns("I'm fine");
+            const sendEmailFake = sinon.fake.throws("sender: Oh No!");
+            const notifyClientMock = {prepareUpload: prepareUploadFake, sendEmail: sendEmailFake};
+            const notificationService: NotificationService = new NotificationService(notifyClientMock);
 
             const params = {
                 personalisation: {
@@ -73,39 +90,15 @@ describe("gov-notify", () => {
                     file_size: "306784"
                 },
                 email: "testemai@testdomain.com",
-                certificate: fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/1_1B7GG36N12S678410_1.base64`))
+                certificate: "certData"
             };
 
-            const expectedResponseBody = {
-                body: {
-                    content: {
-                        body: "Please see the link below to access the test certificate for vehicle(s) BQ91YHQ conducted on  11 March 2019\r\n\r\nhttps://documents.service.gov.uk/d/vCpIdzyaTQ6ia4xwEKvozQ/I6u9a50YSmOfW5lEZ2hfyw?key=" +
-                            "VvpAYmGOFN3L1wYLW3i13zVty3TFWDM-_3KyUSOtqrY\r\nprs certificate for Annual test (PSV_PRS)(pdf,306784)\r\n\r\nWe ask that Vehicle Standards Assessors do not keep certificates on their laptops, to remain c" +
-                            "ompliant with the GeneralData Protection Regulation (GDPR).\r\n\r\nIf any of the certificate details are incorrect, please use the following contacts:\r\n\r\nVehicle Standards Assessors: the retro key t" +
-                            "eam or your TTL\n\nAll otherrecipients: enquiries@dvsa.gov.uk or call 0300 123 9000.\r\n\r\nDVSA (Driver and Vehicle Standards Agency)",
-                        from_email: "commercial.vehicle.services@notifications.service.gov.uk",
-                        subject: "BQ91YHQ Annual test|11 March 2019 (Certificate 1 of 2)"
-                    },
-                    id: "e5bb37e8-f95f-4003-8b39-846a03dcb9cb",
-                    reference: null,
-                    scheduled_for: null,
-                    template: {
-                        id: "1b602e0e-b53a-452a-858f-c5831ef3ed70",
-                        uri: "https://api.notifications.service.gov.uk/services/bc2a4877-3c9a-4d0e-a26b-8c7010abe8cd/templates/1b602e0e-b53a-452a-858f-c5831ef3ed70",
-                        version: 11
-                    },
-                    uri: "https://api.notifications.service.gov.uk/v2/notifications/e5bb37e8-f95f-4003-8b39-846a03dcb9cb"
-                }
-            };
-
-            NotifyClientMock.sendEmailResponse = expectedResponseBody;
-
-
-            notificationService.sendNotification(params)
-                .then((response: any) => {
-                    expect(response).to.eql(expectedResponseBody);
-                });
-        });
+            try {
+                await notificationService.sendNotification(params);
+                expect.fail();
+            } catch (e) {
+                expect(e.message).to.equal("sender: Oh No!");
+            }
         });
     });
 });

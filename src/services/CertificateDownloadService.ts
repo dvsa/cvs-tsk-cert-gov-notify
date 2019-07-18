@@ -24,7 +24,7 @@ class CertificateDownloadService {
     public getCertificate(fileName: string) {
         return this.s3Client.download(`cvs-cert-${process.env.BUCKET}`, fileName)
         .then((result: S3.Types.GetObjectOutput) => {
-            console.log(`Downloading result: ${JSON.stringify(result)}`);
+            console.log(`Downloading result: ${JSON.stringify(this.cleanForLogging(result))}`);
             const notifyPartialParams = {
                 personalisation: {
                     vrms: result.Metadata!.vrm,
@@ -40,11 +40,23 @@ class CertificateDownloadService {
                 email: result.Metadata!.email,
                 certificate: result.Body
             };
-            console.log(`Notify partial params: ${JSON.stringify(notifyPartialParams)}`);
+            // console.log(`Notify partial params: ${JSON.stringify(notifyPartialParams)}`);
             return notifyPartialParams;
         }).catch((error) => {
-                console.error(error);
-            });
+            console.error(error);
+            throw error;
+        });
+    }
+
+    /**
+     * reduce bloat in cloudwatch logs by trimming out meaningless data
+     * @param input
+     */
+    public cleanForLogging(input: any) {
+        const retVal = {...input};
+        retVal.Body = {redacted: true};
+        if (retVal.$response) {delete retVal.$response; }
+        return retVal;
     }
 
 }

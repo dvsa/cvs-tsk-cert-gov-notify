@@ -18,6 +18,10 @@ class S3BucketMockService {
     public static buckets: IBucket[] = [];
     public static metadata: any;
 
+    public static setMetadata = (metadata: any) => {
+        S3BucketMockService.metadata = metadata;
+    }
+
     /**
      * Uploads a file to an S3 bucket
      * @param bucketName - the bucket to upload to
@@ -78,19 +82,17 @@ class S3BucketMockService {
         const bucket: IBucket | undefined = S3BucketMockService.buckets.find((currentBucket: IBucket) => {
             return currentBucket.bucketName === bucketName;
         });
-
         if (!bucket) {
             const error: Error = new Error();
+
             Object.assign(error, {
                 message: "The specified bucket does not exist.",
                 code: "NoSuchBucket",
                 statusCode: 404,
                 retryable: false
             });
-
             throw error;
         }
-
         // @ts-ignore
         const bucketKey: string | undefined = bucket.files.find((currentFileName: string) => {
             return currentFileName === fileName;
