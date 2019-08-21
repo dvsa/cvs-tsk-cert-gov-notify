@@ -4,6 +4,7 @@ import {ManagedUpload} from "aws-sdk/clients/s3";
 import {CertificateDownloadService} from "../services/CertificateDownloadService";
 import {Injector} from "../models/injector/Injector";
 import {NotificationService} from "../services/NotificationService";
+import {ERRORS} from "../assets/enum";
 // @ts-ignore
 import {NotifyClient} from "notifications-node-client";
 import {Configuration} from "../utils/Configuration";
@@ -14,9 +15,9 @@ import {Configuration} from "../utils/Configuration";
  * @param callback - callback function
  */
 const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?: Callback): Promise<void | ManagedUpload.SendData[]> => {
-    if (!event) {
+    if (!event || !event.Records || !Array.isArray(event.Records) || !event.Records.length) {
         console.error("ERROR: event is not defined.");
-        return;
+        throw new Error(ERRORS.EventIsEmpty);
     }
 
     const downloadService: CertificateDownloadService = Injector.resolve<CertificateDownloadService>(CertificateDownloadService);
@@ -42,6 +43,7 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
     return Promise.all(notifyPromises)
     .catch((error: any) => {
         console.error(error);
+        throw error;
     });
 };
 

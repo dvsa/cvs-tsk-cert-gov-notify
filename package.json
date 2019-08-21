@@ -14,7 +14,7 @@
     "lint": "node_modules/tslint/bin/tslint --project tsconfig.json -q",
     "prepush": "npm test && npm run lint",
     "sonar-scanner": "npm run lint && npm run coverage && sonar-scanner",
-    "coverage": "node_modules/.bin/nyc mocha tests/unit/*.unitTest.ts && node_modules/.bin/nyc report --reporter=lcov",
+    "coverage": "BUCKET=local BRANCH=local node_modules/.bin/nyc mocha tests/unit/*.unitTest.ts && node_modules/.bin/nyc report --reporter=lcov",
     "audit-dep": "npm audit"
   },
   "nyc": {
@@ -52,6 +52,8 @@
     "@types/lambda-tester": "^3.5.1",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.12.30",
+    "@types/sinon": "^7.0.13",
+    "@types/sinon-chai": "^3.2.2",
     "chai": "^4.2.0",
     "lambda-tester": "latest",
     "mocha": "^5.2.0",
@@ -59,6 +61,8 @@
     "serverless": "^1.42.3",
     "serverless-plugin-tracing": "^2.0.0",
     "serverless-plugin-typescript": "^1.1.5",
+    "sinon": "^7.3.2",
+    "sinon-chai": "^3.3.0",
     "ts-node-register": "^1.0.0",
     "tslint": "^5.13.1",
     "typescript": "^3.3.3333"
