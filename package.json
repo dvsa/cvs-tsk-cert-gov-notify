@@ -10,61 +10,63 @@
     "build:dev": "node_modules/typescript/bin/tsc && npm run build:copy",
     "build:copy": "find src -type f \\( -name \"*.yml\" -or -name \"*.json\" \\) | cpio -pdm .build && find tests -type f \\( -name \"*.yml\" -or -name \"*.json\" -or -name \"*.base64\" \\)  | cpio -pdm .build",
     "build:docker": "docker-compose -f docker-compose.yml up -d --build",
-    "test": "BUCKET=local BRANCH=local node_modules/.bin/mocha .build/tests/**/*.unitTest.js",
-    "lint": "node_modules/tslint/bin/tslint --project tsconfig.json -q",
-    "prepush": "npm test && npm run lint",
-    "sonar-scanner": "npm run lint && npm run coverage && sonar-scanner",
-    "coverage": "BUCKET=local BRANCH=local node_modules/.bin/nyc mocha tests/unit/*.unitTest.ts && node_modules/.bin/nyc report --reporter=lcov",
+    "test": "BRANCH=local BUCKET=local jest --testMatch=\"**/*.unitTest.ts\" --coverage",
+    "test-i": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\" --runInBand",
+    "tslint": "node_modules/tslint/bin/tslint --project tsconfig.json -q",
+    "prepush": "npm test && npm run tslint",
+    "sonar-scanner": "npm run tslint && npm run coverage && sonar-scanner",
+    "coverage": "BRANCH=local BUCKET=local SLS_DEBUG=* jest --testMatch=\"**/*.*Test.ts\" --runInBand --coverage --detectOpenHandles",
     "audit-dep": "npm audit"
-  },
-  "nyc": {
-    "include": [
-      "src/**/*.ts",
-      "src/**/*.tsx"
-    ],
-    "extension": [
-      ".ts",
-      ".tsx"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
-    "reporter": [
-      "text-summary",
-      "html"
-    ],
-    "sourceMap": true,
-    "instrument": true
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "aws-lambda": "^0.1.2",
-    "aws-sdk": "^2.416.0",
-    "aws-xray-sdk": "^2.3.3",
+    "aws-sdk": "^2.556.0",
+    "aws-xray-sdk": "^2.4.0",
     "node-yaml": "^3.2.0",
     "notifications-node-client": "^4.6.0",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.21",
-    "@types/chai": "^4.1.7",
+    "@types/aws-lambda": "^8.10.33",
+    "@types/jest": "^24.0.19",
+    "@types/jest-plugin-context": "^2.9.2",
     "@types/lambda-tester": "^3.5.1",
-    "@types/mocha": "^5.2.5",
-    "@types/node": "^10.12.30",
+    "@types/node": "^10.17.0",
     "@types/sinon": "^7.0.13",
     "@types/sinon-chai": "^3.2.2",
-    "chai": "^4.2.0",
+    "aws-lambda-mock-context": "^3.2.1",
+    "husky": "^3.0.9",
+    "jest": "^24.9.0",
+    "jest-plugin-context": "^2.9.0",
+    "jest-sonar-reporter": "^2.0.0",
     "lambda-tester": "latest",
-    "mocha": "^5.2.0",
-    "nyc": "^14.1.1",
-    "serverless": "^1.42.3",
+    "serverless": "^1.55.1",
     "serverless-plugin-tracing": "^2.0.0",
-    "serverless-plugin-typescript": "^1.1.5",
+    "serverless-plugin-typescript": "^1.1.9",
     "sinon": "^7.3.2",
     "sinon-chai": "^3.3.0",
+    "ts-jest": "^24.1.0",
     "ts-node-register": "^1.0.0",
-    "tslint": "^5.13.1",
-    "typescript": "^3.3.3333"
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.4"
+  },
+  "jestSonar": {
+    "reportPath": ".reports",
+    "reportFile": "test-report.xml",
+    "indent": 4
+  },
+  "jest": {
+    "coverageDirectory": "./coverage",
+    "collectCoverage": true,
+    "testResultsProcessor": "jest-sonar-reporter",
+    "testURL": "http://localhost"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run prepush",
+      "pre-push": "npm run prepush"
+    }
   }
 }
