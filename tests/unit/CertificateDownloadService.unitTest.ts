@@ -1,18 +1,17 @@
-import {describe} from "mocha";
-import chai, {expect} from "chai";
 import {Injector} from "../../src/models/injector/Injector";
 import * as fs from "fs";
 import * as path from "path";
 import {CertificateDownloadService} from "../../src/services/CertificateDownloadService";
 import {S3BucketMockService} from "../models/S3BucketMockService";
 import sinon from "sinon";
-import sinonChai from "sinon-chai";
 // @ts-ignore
 import {NotifyClient} from "notifications-node-client";
 const sandbox = sinon.createSandbox();
-chai.use(sinonChai);
 
 describe("CertificateDownloadService", () => {
+    beforeAll(()  => {
+        process.env.BUCKET = "local";
+    });
     afterEach(() => {
         sandbox.restore();
     });
@@ -54,16 +53,16 @@ describe("CertificateDownloadService", () => {
             };
 
             const response = await certificateDownloadService.getCertificate("1_1B7GG36N12S678410_1.base64");
-            expect(response).to.deep.equal(expectedResponse);
+            expect(response).toEqual(expectedResponse);
         });
         it("should bubble up error from S3 Client", async () => {
             // Remove bucket so download fails
             S3BucketMockService.buckets.pop();
+            expect.assertions(1);
             try {
                 await certificateDownloadService.getCertificate("1_1B7GG36N12S678410_1.base64");
-                expect.fail();
             } catch (e) {
-                expect(e.message).to.equal("The specified bucket does not exist.");
+                expect(e.message).toEqual("The specified bucket does not exist.");
             }
         });
     });
@@ -80,7 +79,7 @@ describe("CertificateDownloadService", () => {
                 Survives: true
             };
             const response = certificateDownloadService.cleanForLogging(input);
-            expect(response).to.deep.equal(expectedOutput);
+            expect(response).toEqual(expectedOutput);
         });
 
         it("strips out garbage (without $response)", () => {
@@ -93,7 +92,7 @@ describe("CertificateDownloadService", () => {
                 Survives: true
             };
             const response = certificateDownloadService.cleanForLogging(input);
-            expect(response).to.deep.equal(expectedOutput);
+            expect(response).toEqual(expectedOutput);
         });
     });
 });
