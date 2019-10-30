@@ -11,7 +11,7 @@
     "build:copy": "find src -type f \\( -name \"*.yml\" -or -name \"*.json\" \\) | cpio -pdm .build && find tests -type f \\( -name \"*.yml\" -or -name \"*.json\" -or -name \"*.base64\" \\)  | cpio -pdm .build",
     "build:docker": "docker-compose -f docker-compose.yml up -d --build",
     "test": "BRANCH=local BUCKET=local jest --testMatch=\"**/*.unitTest.ts\" --coverage",
-    "test-i": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\" --runInBand",
+    "test-i": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\" --runInBand --passWithNoTests",
     "tslint": "node_modules/tslint/bin/tslint --project tsconfig.json -q",
     "prepush": "npm test && npm run tslint",
     "sonar-scanner": "npm run tslint && npm run coverage && sonar-scanner",
