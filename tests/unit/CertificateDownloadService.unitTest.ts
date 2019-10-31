@@ -1,17 +1,18 @@
-import {Injector} from "../../src/models/injector/Injector";
 import * as fs from "fs";
 import * as path from "path";
 import {CertificateDownloadService} from "../../src/services/CertificateDownloadService";
 import {S3BucketMockService} from "../models/S3BucketMockService";
 import sinon from "sinon";
-// @ts-ignore
-import {NotifyClient} from "notifications-node-client";
-const sandbox = sinon.createSandbox();
+import {Configuration} from "../../src/utils/Configuration";
 
 describe("CertificateDownloadService", () => {
-    beforeAll(()  => {
-        process.env.BUCKET = "local";
-    });
+    const sandbox = sinon.createSandbox();
+    process.env.BUCKET = "local";
+    // @ts-ignore
+    (Configuration as any).instance = new Configuration("../../src/config/config.yml", "../../tests/resources/mockSecrets.yml");
+    // @ts-ignore
+    const certificateDownloadService: CertificateDownloadService = new CertificateDownloadService(new S3BucketMockService());
+
     afterEach(() => {
         sandbox.restore();
     });
@@ -32,7 +33,6 @@ describe("CertificateDownloadService", () => {
         "file-size": "306784",
         "email": "testemail@testdomain.com"
     });
-    const certificateDownloadService: CertificateDownloadService = Injector.resolve<CertificateDownloadService>(CertificateDownloadService, [S3BucketMockService]);
 
     context("getCertificate()", () => {
         it("should return appropriate data", async () => {
@@ -51,7 +51,7 @@ describe("CertificateDownloadService", () => {
                 email: "testemail@testdomain.com",
                 certificate: fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/1_1B7GG36N12S678410_1.base64`))
             };
-
+            expect.assertions(1);
             const response = await certificateDownloadService.getCertificate("1_1B7GG36N12S678410_1.base64");
             expect(response).toEqual(expectedResponse);
         });

@@ -1,10 +1,14 @@
 import {NotificationService} from "../../src/services/NotificationService";
 import sinon from "sinon";
 // @ts-ignore
-import {NotifyClient} from "notifications-node-client";
+import {Configuration} from "../../src/utils/Configuration";
 const sandbox = sinon.createSandbox();
 
 describe("NotificationService", () => {
+    beforeAll(() => {
+        // @ts-ignore
+        (Configuration as any).instance = new Configuration("../../src/config/config.yml", "../../tests/resources/mockSecrets.yml");
+    });
     afterEach(() => {
         sandbox.restore();
     });
