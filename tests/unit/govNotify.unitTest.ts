@@ -1,14 +1,23 @@
 import lambdaTester from "lambda-tester";
 import {handler} from "../../src/handler";
+import {Configuration} from "../../src/utils/Configuration";
+import {CertificateDownloadService} from "../../src/services/CertificateDownloadService";
+import {NotificationService} from "../../src/services/NotificationService";
 
 describe("gov-notify", () => {
   beforeAll(() => {
     process.env.BUCKET = "local";
+    // @ts-ignore
+    (Configuration as any).instance = new Configuration("../../src/config/config.yml", "../../tests/resources/mockSecrets.yml");
   });
   context("handler", () => {
       context("when the request is valid", () => {
         it("response should resolve ", () => {
-          // @ts-ignore
+          CertificateDownloadService.prototype.getCertificate = jest.fn().mockResolvedValue("");
+          NotificationService.prototype.sendNotification = jest.fn().mockResolvedValue({body: { content: {
+                from_email: "commercial.vehicle.services@notifications.service.gov.uk",
+                subject: "BQ91YHQ Annual test|11 March 2019 (Certificate 1 of 2)",
+              }}});
           return lambdaTester(handler)
             .event({
               Records: [

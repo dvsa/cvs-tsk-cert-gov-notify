@@ -15,7 +15,7 @@
     "tslint": "node_modules/tslint/bin/tslint --project tsconfig.json -q",
     "prepush": "npm test && npm run tslint",
     "sonar-scanner": "npm run tslint && npm run coverage && sonar-scanner",
-    "coverage": "BRANCH=local BUCKET=local SLS_DEBUG=* jest --testMatch=\"**/*.*Test.ts\" --runInBand --coverage --detectOpenHandles",
+    "coverage": "BRANCH=local BUCKET=local SLS_DEBUG=* jest --testMatch=\"**/*.*Test.ts\" --runInBand --coverage",
     "audit-dep": "npm audit"
   },
   "author": "",
