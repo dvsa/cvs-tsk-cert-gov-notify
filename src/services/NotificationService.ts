@@ -1,12 +1,10 @@
 // @ts-ignore
 import {NotifyClient} from "notifications-node-client";
-import {Service} from "../models/injector/ServiceDecorator";
 import {TEMPLATEIDS} from "../assets/enum";
 
 /**
  * Service class for Certificate Notifications
  */
-@Service()
 class NotificationService {
     private readonly notifyClient: NotifyClient;
 

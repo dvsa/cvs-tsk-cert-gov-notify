@@ -1,6 +1,5 @@
 import S3, {Metadata} from "aws-sdk/clients/s3";
 import {AWSError, config as AWSConfig} from "aws-sdk";
-import {Service} from "../models/injector/ServiceDecorator";
 import {Readable} from "stream";
 import {Configuration} from "../utils/Configuration";
 import {IS3Config} from "../models";
@@ -13,7 +12,6 @@ const AWSXRay = require("aws-xray-sdk");
 /**
  * Service class for communicating with Simple Storage Service
  */
-@Service()
 class S3BucketService {
     public readonly s3Client: S3;
 

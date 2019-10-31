@@ -2,12 +2,13 @@
 import {Callback, Context, Handler, S3Event, S3EventRecord, SQSEvent, SQSRecord} from "aws-lambda";
 import {ManagedUpload} from "aws-sdk/clients/s3";
 import {CertificateDownloadService} from "../services/CertificateDownloadService";
-import {Injector} from "../models/injector/Injector";
 import {NotificationService} from "../services/NotificationService";
 import {ERRORS} from "../assets/enum";
+import {S3} from "aws-sdk";
 // @ts-ignore
 import {NotifyClient} from "notifications-node-client";
 import {Configuration} from "../utils/Configuration";
+import {S3BucketService} from "../services/S3BucketService";
 /**
  * λ function to process an SQS record and initialise email notifications for generated certificates
  * @param event - SQS event
@@ -20,7 +21,7 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
         throw new Error(ERRORS.EventIsEmpty);
     }
 
-    const downloadService: CertificateDownloadService = Injector.resolve<CertificateDownloadService>(CertificateDownloadService);
+    const downloadService: CertificateDownloadService = new CertificateDownloadService(new S3BucketService(new S3()));
     const notifyClient = new NotifyClient(Configuration.getInstance().getNotifyConfig().api_key);
     const notifyService: NotificationService = new NotificationService(notifyClient);
     const notifyPromises: Array<Promise<any>> = [];

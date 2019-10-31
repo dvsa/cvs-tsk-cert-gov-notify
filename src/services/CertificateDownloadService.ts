@@ -1,13 +1,11 @@
 import {Configuration} from "../utils/Configuration";
 import {S3BucketService} from "./S3BucketService";
-import {Service} from "../models/injector/ServiceDecorator";
 import S3 from "aws-sdk/clients/s3";
 
 
 /**
  * Service class for Certificate Generation
  */
-@Service()
 class CertificateDownloadService {
     private readonly s3Client: S3BucketService;
     private readonly config: Configuration;
