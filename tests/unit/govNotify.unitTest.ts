@@ -54,7 +54,7 @@ describe("gov-notify", () => {
             // @ts-ignore
           return lambdaTester(handler)
             .event(undefined)
-            .expectReject((result) => {
+            .expectReject((result: Error) => {
                expect(result).toBeInstanceOf(Error);
                expect(result.message).toEqual("Event is empty");
             });
