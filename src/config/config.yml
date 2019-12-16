@@ -5,19 +5,19 @@ invoke:
       endpoint: http://localhost:3000
     functions:
       testResults:
-          name: cvs-svc-test-results
-          mock: tests/resources/test-results-response.json
+        name: cvs-svc-test-results
+        mock: tests/resources/test-results-response.json
       techRecords:
-          name: cvs-svc-technical-records
-          mock: tests/resources/tech-records-response.json
+        name: cvs-svc-technical-records
+        mock: tests/resources/tech-records-response.json
   remote:
     params:
       apiVersion: 2015-03-31
     functions:
       testResults:
-          name: test-results-${BRANCH}
+        name: test-results-${BRANCH}
       techRecords:
-          name: technical-records-${BRANCH}
+        name: technical-records-${BRANCH}
 s3:
   local:
     endpoint: http://localhost:7000
