@@ -1,7 +1,7 @@
 import * as notify from "../../src/functions/govNotify";
-import {config as AWSConfig} from "aws-sdk";
+import { config as AWSConfig } from "aws-sdk";
 import mockContext from "aws-lambda-mock-context";
-import {Configuration} from "../../src/utils/Configuration";
+import { Configuration } from "../../src/utils/Configuration";
 
 describe("handler", () => {
   // @ts-ignore
