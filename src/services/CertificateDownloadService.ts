@@ -36,6 +36,7 @@ class CertificateDownloadService {
             file_size: result.Metadata!["file-size"]
           },
           email: result.Metadata!.email,
+          shouldEmailCertificate: result.Metadata!["should-email-certificate"],
           certificate: result.Body
         };
         // console.log(`Notify partial params: ${JSON.stringify(notifyPartialParams)}`);
