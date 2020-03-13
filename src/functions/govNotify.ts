@@ -36,7 +36,9 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
 
       const notifyPromise = downloadService.getCertificate(s3Object.key)
         .then((notifyPartialParams: any) => {
-          return notifyService.sendNotification(notifyPartialParams);
+          if (!notifyPartialParams.shouldEmailCertificate || notifyPartialParams.shouldEmailCertificate === "true") {
+            return notifyService.sendNotification(notifyPartialParams);
+          }
         });
 
       notifyPromises.push(notifyPromise);
