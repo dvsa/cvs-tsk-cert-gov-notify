@@ -1,5 +1,10 @@
 export enum TEMPLATEIDS {
-  CertificateEmail = "1b602e0e-b53a-452a-858f-c5831ef3ed70",
+  CERTIFICATE_EMAIL = "1b602e0e-b53a-452a-858f-c5831ef3ed70",
+  PLATES_EMAIL = "340070f3-5fad-496a-a82e-48a0ec82c274"
+}
+
+export enum CERT_TYPE {
+  VTG6_VTG7 = "VTG6_VTG7"
 }
 
 export enum ERRORS {
