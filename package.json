@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "Certificate generation initiation task",
   "main": "handler.js",
+  "engines": {
+    "node": "10.18.1",
+    "npm": "5.6.0"
+  },
   "scripts": {
     "start": "BRANCH=local BUCKET=local node_modules/serverless/bin/serverless invoke local -f main --path tests/resources/s3-event.json",
     "start:docker": "docker-compose -f docker-compose.yml up -d",
@@ -17,7 +21,7 @@
     "prepush": "npm test && npm run tslint && npm run security-checks",
     "sonar-scanner": "npm run tslint && npm run coverage && sonar-scanner",
     "coverage": "BRANCH=local BUCKET=local SLS_DEBUG=* jest --testMatch=\"**/*.*Test.ts\" --runInBand --coverage",
-    "audit-dep": "npm audit",
+    "audit-dep": "npm audit --json | node_modules/.bin/audit-filter --nsp-config=.nsprc --audit=-",
     "package": "mkdir -p ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME}/ && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip ."
   },
   "author": "",
@@ -40,6 +44,7 @@
     "@types/sinon": "^7.5.1",
     "@types/sinon-chai": "^3.2.3",
     "acorn": "^7.3.1",
+    "audit-filter": "^0.5.0",
     "aws-lambda-mock-context": "^3.2.1",
     "aws-sdk-mock": "^4.5.0",
     "chai": "^4.2.0",
