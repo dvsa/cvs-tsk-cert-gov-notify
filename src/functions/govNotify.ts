@@ -33,8 +33,10 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
 
     objectPutEvent.Records.forEach((s3Record: S3EventRecord) => {
       const s3Object: any = s3Record.s3.object;
+      // Object key may have spaces or unicode non-ASCII characters.
+      const decodedS3Key = decodeURIComponent(s3Object.key.replace(/\+/g, " "));
 
-      const notifyPromise = downloadService.getCertificate(s3Object.key)
+      const notifyPromise = downloadService.getCertificate(decodedS3Key)
         .then((notifyPartialParams: any) => {
           if (!notifyPartialParams.shouldEmailCertificate || notifyPartialParams.shouldEmailCertificate === "true") {
             return notifyService.sendNotification(notifyPartialParams);

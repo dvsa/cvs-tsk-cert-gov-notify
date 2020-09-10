@@ -92,6 +92,42 @@ describe("gov-notify", () => {
             });
         });
       });
+
+      context("and the S3 key contains special characters", () => {
+        it("should convert + to space", () => {
+          CertificateDownloadService.prototype.getCertificate = jest.fn().mockResolvedValue("");
+          NotificationService.prototype.sendNotification = jest.fn().mockResolvedValue("sent notification");
+          const s3KeyReceived = "W01A01030_+BUG1+234567+2227.pdf";
+          const expectedDecodedS3Key = "W01A01030_ BUG1 234567 2227.pdf";
+          const eventBody = JSON.parse(event.Records[0].body);
+          eventBody.Records[0].s3.object.key = s3KeyReceived;
+          event.Records[0].body = JSON.stringify(eventBody);
+          return lambdaTester(handler)
+            .event(event)
+            .expectResolve((result: any) => {
+              expect(result[0]).toEqual("sent notification");
+              expect(NotificationService.prototype.sendNotification).toHaveBeenCalled();
+              expect(CertificateDownloadService.prototype.getCertificate).toHaveBeenCalledWith(expectedDecodedS3Key);
+            });
+        });
+
+        it("should convert + to space and decode the other special characters", () => {
+          CertificateDownloadService.prototype.getCertificate = jest.fn().mockResolvedValue("");
+          NotificationService.prototype.sendNotification = jest.fn().mockResolvedValue("sent notification");
+          const s3KeyReceived = "W01A01232_+YV31ME00000+1/%5C*-1.pdf";
+          const expectedDecodedS3Key = "W01A01232_ YV31ME00000 1/\\*-1.pdf";
+          const eventBody = JSON.parse(event.Records[0].body);
+          eventBody.Records[0].s3.object.key = s3KeyReceived;
+          event.Records[0].body = JSON.stringify(eventBody);
+          return lambdaTester(handler)
+            .event(event)
+            .expectResolve((result: any) => {
+              expect(result[0]).toEqual("sent notification");
+              expect(NotificationService.prototype.sendNotification).toHaveBeenCalled();
+              expect(CertificateDownloadService.prototype.getCertificate).toHaveBeenCalledWith(expectedDecodedS3Key);
+            });
+        });
+      });
     });
 
     context("when the request is not valid", () => {

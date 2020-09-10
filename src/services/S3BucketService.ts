@@ -1,10 +1,8 @@
-import S3, { Metadata } from "aws-sdk/clients/s3";
-import { AWSError, config as AWSConfig } from "aws-sdk";
-import { Readable } from "stream";
-import { Configuration } from "../utils/Configuration";
-import { IS3Config } from "../models";
-import { ManagedUpload } from "aws-sdk/lib/s3/managed_upload";
-import { PromiseResult } from "aws-sdk/lib/request";
+import S3 from "aws-sdk/clients/s3";
+import {AWSError, config as AWSConfig} from "aws-sdk";
+import {Configuration} from "../utils/Configuration";
+import {IS3Config} from "../models";
+import {PromiseResult} from "aws-sdk/lib/request";
 /* tslint:disable */
 const AWSXRay = require("aws-xray-sdk");
 
@@ -21,22 +19,6 @@ class S3BucketService {
     this.s3Client = AWSXRay.captureAWSClient(s3Client);
 
     AWSConfig.s3 = config;
-  }
-
-  /**
-   * Uploads a file to an S3 bucket
-   * @param bucketName - the bucket to upload to
-   * @param fileName - the name of the file
-   * @param content - contents of the file
-   * @param metadata - optional metadata
-   */
-  public upload(bucketName: string, fileName: string, content: Buffer | Uint8Array | Blob | string | Readable, metadata?: Metadata): Promise<ManagedUpload.SendData> {
-    return this.s3Client.upload({
-      Bucket: bucketName,
-      Key: `${process.env.BRANCH}/${fileName}`,
-      Body: content,
-      Metadata: metadata
-    }).promise();
   }
 
   /**
