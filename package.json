@@ -27,7 +27,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.589.0",
+    "aws-sdk": "^2.901.0",
     "aws-xray-sdk": "^2.5.0",
     "js-yaml": "^3.13.1",
     "node-yaml": "^3.2.0",
