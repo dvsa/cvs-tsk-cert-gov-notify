@@ -18,7 +18,7 @@
     "test": "AWS_XRAY_CONTEXT_MISSING=LOG_ERROR SECRET_NAME=cvs-tsk-cert-gov-notify/api-key BRANCH=local BUCKET=local jest --testMatch=\"**/*.unitTest.ts\"",
     "test-i": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\" --runInBand --passWithNoTests",
     "tslint": "tslint --project tsconfig.json -q",
-    "prepush": "npm run coverage",
+    "prepush": "npm run coverage && npm run build",
     "sonar-scanner": "npm run tslint && npm run coverage && sonar-scanner",
     "coverage": "npm t -- --runInBand --coverage",
     "audit:check": "npm audit --json | node_modules/.bin/audit-filter --nsp-config=.nsprc --audit=-",
@@ -79,7 +79,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run security-checks && npm run tslint && npm run build",
+      "pre-commit": "npm run security-checks && npm audit && npm run tslint",
       "pre-push": "npm run prepush"
     }
   }
