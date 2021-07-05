@@ -1,6 +1,6 @@
 // @ts-ignore
 import { NotifyClient } from "notifications-node-client";
-import { TEMPLATEIDS } from "../assets/enum";
+import {CERT_TYPE, TEMPLATEIDS} from "../assets/enum";
 
 /**
  * Service class for Certificate Notifications
@@ -24,8 +24,10 @@ class NotificationService {
       }
     };
 
-    console.log(`Sent email using ${TEMPLATEIDS.CertificateEmail} templateId, ${notifyPartialParams.personalisation.test_type_name} test type name and ${notifyPartialParams.personalisation.date_of_issue} date of issue`);
-    return this.notifyClient.sendEmail(TEMPLATEIDS.CertificateEmail, notifyPartialParams.email, emailDetails)
+    const emailTemplateId = notifyPartialParams.personalisation.cert_type === CERT_TYPE.VTG6_VTG7 ? TEMPLATEIDS.PLATES_EMAIL : TEMPLATEIDS.CERTIFICATE_EMAIL;
+
+    console.log(`Sent email using ${emailTemplateId} templateId, ${notifyPartialParams.personalisation.test_type_name} test type name and ${notifyPartialParams.personalisation.date_of_issue} date of issue`);
+    return this.notifyClient.sendEmail(emailTemplateId, notifyPartialParams.email, emailDetails)
       .then((response: any) => {
         return response;
       })
