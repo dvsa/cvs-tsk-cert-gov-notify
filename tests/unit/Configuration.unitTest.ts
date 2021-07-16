@@ -14,7 +14,6 @@ describe("Configuration", () => {
   beforeEach(() => {
     branch = process.env.BRANCH;
     process.env.BRANCH = "local";
-
   });
   afterEach(() => {
     process.env.BRANCH = branch;
@@ -27,18 +26,18 @@ describe("Configuration", () => {
       expect(invokeConfig).toEqual({
         params: {
           apiVersion: "2015-03-31T00:00:00.000Z",
-          endpoint: "http://localhost:3000"
+          endpoint: "http://localhost:3000",
         },
         functions: {
           testResults: {
             name: "cvs-svc-test-results",
-            mock: "tests/resources/test-results-response.json"
+            mock: "tests/resources/test-results-response.json",
           },
           techRecords: {
             name: "cvs-svc-technical-records",
-            mock: "tests/resources/tech-records-response.json"
-          }
-        }
+            mock: "tests/resources/tech-records-response.json",
+          },
+        },
       });
     });
   });
@@ -79,20 +78,20 @@ describe("Configuration", () => {
       await expect(config.getNotifyConfig()).rejects.toThrowError();
     });
     it("should succeed if secrets.yml exists", async () => {
-      await fs.writeFileSync("src/config/secrets.yml", safeDump({notify: {api_key: "asddfg"}}));
+      await fs.writeFileSync("src/config/secrets.yml", safeDump({ notify: { api_key: "asddfg" } }));
       const notify = await config.getNotifyConfig();
       expect(notify.api_key).toBe("asddfg");
       await fs.unlinkSync("src/config/secrets.yml");
     });
   });
-  process.env = {...OLD_ENV};
+  process.env = { ...OLD_ENV };
 
   context("when calling getGovNotifyConfig and the SECRET_NAME environment variable set", () => {
     it("should return a correct MOT config", async () => {
       const fakeResp: GetSecretValueResponse = {
         SecretString: `notify:
   endpoint: asdfg
-  apiKey: asfg`
+  apiKey: asfg`,
       };
       const spy: SinonSpy = fake.resolves(fakeResp);
       AWSMock.setSDKInstance(AWS);

@@ -16,7 +16,7 @@ describe("NotificationService", () => {
     it("should return appropriate data", async () => {
       const prepareUploadFake = sinon.fake.returns("pathToThings");
       const sendEmailFake = sinon.fake.resolves("it worked");
-      const notifyClientMock = {prepareUpload: prepareUploadFake, sendEmail: sendEmailFake};
+      const notifyClientMock = { prepareUpload: prepareUploadFake, sendEmail: sendEmailFake };
       const notificationService: NotificationService = new NotificationService(notifyClientMock);
 
       const params = {
@@ -28,10 +28,10 @@ describe("NotificationService", () => {
           test_type_result: "prs",
           cert_type: "PSV_PRS",
           file_format: "pdf",
-          file_size: "306784"
+          file_size: "306784",
         },
         email: "testemail@testdomain.com",
-        certificate: "certData"
+        certificate: "certData",
       };
 
       const resp = await notificationService.sendNotification(params);
@@ -41,7 +41,7 @@ describe("NotificationService", () => {
     it("should bubble up error if notify client prepareUpload method throws error", async () => {
       const prepareUploadFake = sinon.fake.throws("preparer: Oh No!");
       // const sendEmailFake = sinon.fake.resolves("it worked")
-      const notifyClientMock = {prepareUpload: prepareUploadFake, sendEmail: null};
+      const notifyClientMock = { prepareUpload: prepareUploadFake, sendEmail: null };
       const notificationService: NotificationService = new NotificationService(notifyClientMock);
 
       const params = {
@@ -53,10 +53,10 @@ describe("NotificationService", () => {
           test_type_result: "prs",
           cert_type: "PSV_PRS",
           file_format: "pdf",
-          file_size: "306784"
+          file_size: "306784",
         },
         email: "testemail@testdomain.com",
-        certificate: "certData"
+        certificate: "certData",
       };
 
       expect.assertions(1);
@@ -65,12 +65,11 @@ describe("NotificationService", () => {
       } catch (e) {
         expect(e.message).toEqual("preparer: Oh No!");
       }
-
     });
     it("should bubble up error if notify client sendEmail method throws error", async () => {
       const prepareUploadFake = sinon.fake.returns("I'm fine");
       const sendEmailFake = sinon.fake.throws("sender: Oh No!");
-      const notifyClientMock = {prepareUpload: prepareUploadFake, sendEmail: sendEmailFake};
+      const notifyClientMock = { prepareUpload: prepareUploadFake, sendEmail: sendEmailFake };
       const notificationService: NotificationService = new NotificationService(notifyClientMock);
 
       const params = {
@@ -82,10 +81,10 @@ describe("NotificationService", () => {
           test_type_result: "prs",
           cert_type: "PSV_PRS",
           file_format: "pdf",
-          file_size: "306784"
+          file_size: "306784",
         },
         email: "testemai@testdomain.com",
-        certificate: "certData"
+        certificate: "certData",
       };
 
       expect.assertions(1);

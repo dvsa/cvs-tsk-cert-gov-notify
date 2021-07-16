@@ -20,12 +20,13 @@ class NotificationService {
     const emailDetails = {
       personalisation: {
         ...notifyPartialParams.personalisation,
-        link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.certificate)
-      }
+        link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.certificate),
+      },
     };
 
     console.log(`Sent email using ${TEMPLATEIDS.CertificateEmail} templateId, ${notifyPartialParams.personalisation.test_type_name} test type name and ${notifyPartialParams.personalisation.date_of_issue} date of issue`);
-    return this.notifyClient.sendEmail(TEMPLATEIDS.CertificateEmail, notifyPartialParams.email, emailDetails)
+    return this.notifyClient
+      .sendEmail(TEMPLATEIDS.CertificateEmail, notifyPartialParams.email, emailDetails)
       .then((response: any) => {
         return response;
       })

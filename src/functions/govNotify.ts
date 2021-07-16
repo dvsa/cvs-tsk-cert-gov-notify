@@ -36,22 +36,20 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
       // Object key may have spaces or unicode non-ASCII characters.
       const decodedS3Key = decodeURIComponent(s3Object.key.replace(/\+/g, " "));
 
-      const notifyPromise = downloadService.getCertificate(decodedS3Key)
-        .then((notifyPartialParams: any) => {
-          if (!notifyPartialParams.shouldEmailCertificate || notifyPartialParams.shouldEmailCertificate === "true") {
-            return notifyService.sendNotification(notifyPartialParams);
-          }
-        });
+      const notifyPromise = downloadService.getCertificate(decodedS3Key).then((notifyPartialParams: any) => {
+        if (!notifyPartialParams.shouldEmailCertificate || notifyPartialParams.shouldEmailCertificate === "true") {
+          return notifyService.sendNotification(notifyPartialParams);
+        }
+      });
 
       notifyPromises.push(notifyPromise);
     });
   });
 
-  return Promise.all(notifyPromises)
-    .catch((error: any) => {
-      console.error(error);
-      throw error;
-    });
+  return Promise.all(notifyPromises).catch((error: any) => {
+    console.error(error);
+    throw error;
+  });
 };
 
 export { govNotify };

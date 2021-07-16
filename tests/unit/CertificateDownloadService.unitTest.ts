@@ -19,10 +19,10 @@ describe("CertificateDownloadService", () => {
 
   S3BucketMockService.buckets.push({
     bucketName: "cvs-cert-local",
-    files: ["1_1B7GG36N12S678410_1.base64"]
+    files: ["1_1B7GG36N12S678410_1.base64"],
   });
   S3BucketMockService.setMetadata({
-    "vrm": "BQ91YHQ",
+    vrm: "BQ91YHQ",
     "test-type-name": "Annual test",
     "date-of-issue": "11 March 2019",
     "total-certs": "2",
@@ -31,7 +31,7 @@ describe("CertificateDownloadService", () => {
     "cert-index": "1",
     "file-format": "pdf",
     "file-size": "306784",
-    "email": "testemail@testdomain.com"
+    email: "testemail@testdomain.com",
   });
 
   context("getCertificate()", () => {
@@ -46,10 +46,10 @@ describe("CertificateDownloadService", () => {
           cert_type: "PSV_PRS",
           cert_index: "1",
           file_format: "pdf",
-          file_size: "306784"
+          file_size: "306784",
         },
         email: "testemail@testdomain.com",
-        certificate: fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/1_1B7GG36N12S678410_1.base64`))
+        certificate: fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/1_1B7GG36N12S678410_1.base64`)),
       };
       expect.assertions(1);
       const response = await certificateDownloadService.getCertificate("1_1B7GG36N12S678410_1.base64");
@@ -71,12 +71,12 @@ describe("CertificateDownloadService", () => {
     it("strips out garbage (with $response)", () => {
       const input = {
         Body: "not empty",
-        $response: {thing: "also not empty"},
-        Survives: true
+        $response: { thing: "also not empty" },
+        Survives: true,
       };
       const expectedOutput = {
-        Body: {redacted: true},
-        Survives: true
+        Body: { redacted: true },
+        Survives: true,
       };
       const response = certificateDownloadService.cleanForLogging(input);
       expect(response).toEqual(expectedOutput);
@@ -85,11 +85,11 @@ describe("CertificateDownloadService", () => {
     it("strips out garbage (without $response)", () => {
       const input = {
         Body: "not empty",
-        Survives: true
+        Survives: true,
       };
       const expectedOutput = {
-        Body: {redacted: true},
-        Survives: true
+        Body: { redacted: true },
+        Survives: true,
       };
       const response = certificateDownloadService.cleanForLogging(input);
       expect(response).toEqual(expectedOutput);
