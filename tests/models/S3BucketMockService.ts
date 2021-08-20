@@ -18,7 +18,7 @@ class S3BucketMockService {
   public static buckets: IBucket[] = [];
   public static metadata: any;
 
-  public static setMetadata = (metadata: any) => S3BucketMockService.metadata = metadata;
+  public static setMetadata = (metadata: any) => (S3BucketMockService.metadata = metadata);
 
   /**
    * Uploads a file to an S3 bucket
@@ -38,7 +38,7 @@ class S3BucketMockService {
         message: "The specified bucket does not exist.",
         code: "NoSuchBucket",
         statusCode: 404,
-        retryable: false
+        retryable: false,
       });
 
       throw error;
@@ -55,7 +55,7 @@ class S3BucketMockService {
         message: "The specified key does not exist.",
         code: "NoSuchKey",
         statusCode: 404,
-        retryable: false
+        retryable: false,
       });
 
       throw error;
@@ -65,7 +65,7 @@ class S3BucketMockService {
       Location: `http://localhost:7000/${bucketName}/${fileName}`,
       ETag: "621c9c14d75958d4c3ed8ad77c80cde1",
       Bucket: bucketName,
-      Key: fileName
+      Key: fileName,
     };
 
     return response;
@@ -87,7 +87,7 @@ class S3BucketMockService {
         message: "The specified bucket does not exist.",
         code: "NoSuchBucket",
         statusCode: 404,
-        retryable: false
+        retryable: false,
       });
       throw error;
     }
@@ -102,7 +102,7 @@ class S3BucketMockService {
         message: "The specified key does not exist.",
         code: "NoSuchKey",
         statusCode: 404,
-        retryable: false
+        retryable: false,
       });
 
       throw error;
@@ -115,15 +115,15 @@ class S3BucketMockService {
       ContentLength: file.length,
       ETag: "621c9c14d75958d4c3ed8ad77c80cde1",
       LastModified: new Date(),
-      Metadata: S3BucketMockService.metadata
+      Metadata: S3BucketMockService.metadata,
     };
 
     const response = new Response<S3.Types.GetObjectOutput, AWSError>();
-    Object.assign(response, {data});
+    Object.assign(response, { data });
 
     return {
       $response: response,
-      ...data
+      ...data,
     };
   }
 }

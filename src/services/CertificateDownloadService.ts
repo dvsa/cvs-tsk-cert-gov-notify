@@ -2,7 +2,6 @@ import { Configuration } from "../utils/Configuration";
 import { S3BucketService } from "./S3BucketService";
 import S3 from "aws-sdk/clients/s3";
 
-
 /**
  * Service class for Certificate Generation
  */
@@ -20,7 +19,8 @@ class CertificateDownloadService {
    * @param fileName - the file name of the certificate you want to download
    */
   public getCertificate(fileName: string) {
-    return this.s3Client.download(`cvs-cert-${process.env.BUCKET}`, fileName)
+    return this.s3Client
+      .download(`cvs-cert-${process.env.BUCKET}`, fileName)
       .then((result: S3.Types.GetObjectOutput) => {
         console.log(`Downloading result: ${JSON.stringify(this.cleanForLogging(result))}`);
         const notifyPartialParams = {
@@ -33,15 +33,16 @@ class CertificateDownloadService {
             test_type_result: result.Metadata!["test-type-result"],
             cert_type: result.Metadata!["cert-type"],
             file_format: result.Metadata!["file-format"],
-            file_size: result.Metadata!["file-size"]
+            file_size: result.Metadata!["file-size"],
           },
           email: result.Metadata!.email,
           shouldEmailCertificate: result.Metadata!["should-email-certificate"],
-          certificate: result.Body
+          certificate: result.Body,
         };
         // console.log(`Notify partial params: ${JSON.stringify(notifyPartialParams)}`);
         return notifyPartialParams;
-      }).catch((error) => {
+      })
+      .catch((error) => {
         console.error(error);
         throw error;
       });
@@ -52,14 +53,13 @@ class CertificateDownloadService {
    * @param input
    */
   public cleanForLogging(input: any) {
-    const retVal = {...input};
-    retVal.Body = {redacted: true};
+    const retVal = { ...input };
+    retVal.Body = { redacted: true };
     if (retVal.$response) {
       delete retVal.$response;
     }
     return retVal;
   }
-
 }
 
 export { CertificateDownloadService };

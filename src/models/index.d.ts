@@ -1,6 +1,6 @@
 interface IInvokeConfig {
-  params: { apiVersion: string; endpoint?: string; };
-  functions: { testResults: { name: string }, techRecords: { name: string; mock: string } };
+  params: { apiVersion: string; endpoint?: string };
+  functions: { testResults: { name: string }; techRecords: { name: string; mock: string } };
 }
 
 interface INotifyConfig {
@@ -13,7 +13,7 @@ interface IS3Config {
 
 interface ISecretConfig {
   notify: {
-    api_key: string
+    api_key: string;
   };
 }
 
@@ -30,6 +30,5 @@ interface IConfig {
   notify: INotifyConfig;
   invoke: IIndexInvokeConfig;
 }
-
 
 export { IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig, IConfig };

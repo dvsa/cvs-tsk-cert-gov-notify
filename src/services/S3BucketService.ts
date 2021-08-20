@@ -1,8 +1,8 @@
 import S3 from "aws-sdk/clients/s3";
-import {AWSError, config as AWSConfig} from "aws-sdk";
-import {Configuration} from "../utils/Configuration";
-import {IS3Config} from "../models";
-import {PromiseResult} from "aws-sdk/lib/request";
+import { AWSError, config as AWSConfig } from "aws-sdk";
+import { Configuration } from "../utils/Configuration";
+import { IS3Config } from "../models";
+import { PromiseResult } from "aws-sdk/lib/request";
 /* tslint:disable */
 const AWSXRay = require("aws-xray-sdk");
 
@@ -28,10 +28,12 @@ class S3BucketService {
    */
   public download(bucketName: string, fileName: string): Promise<PromiseResult<S3.Types.GetObjectOutput, AWSError>> {
     console.log(`Downloading file: bucket name: ${bucketName}, key: ${process.env.BRANCH}/${fileName}`);
-    return this.s3Client.getObject({
-      Bucket: bucketName,
-      Key: `${fileName}`,
-    }).promise();
+    return this.s3Client
+      .getObject({
+        Bucket: bucketName,
+        Key: `${fileName}`,
+      })
+      .promise();
   }
 }
 

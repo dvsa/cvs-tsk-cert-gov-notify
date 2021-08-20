@@ -1,0 +1,5 @@
+.build
+.reports
+coverage
+node_modules
+tests/resources/certificates

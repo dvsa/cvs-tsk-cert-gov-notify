@@ -3,13 +3,11 @@
  */
 
 class NotifyClientMock {
-
   public static prepareUploadResponseFile: Buffer;
   public static sendEmailResponse: any;
 
   // tslint:disable-next-line:no-empty
-  constructor(apiKey: any) {
-  }
+  constructor(apiKey: any) {}
 
   /**
    * Mock method for sendEmail. Simulates response for sending email with MOT notification client
@@ -24,8 +22,8 @@ class NotifyClientMock {
   public prepareUpload(pdfData: any) {
     return {
       result: {
-        file: NotifyClientMock.prepareUploadResponseFile
-      }
+        file: NotifyClientMock.prepareUploadResponseFile,
+      },
     };
   }
 }

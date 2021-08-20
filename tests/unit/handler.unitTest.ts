@@ -33,28 +33,4 @@ describe("handler", () => {
       // expect(offline.secretAccessKey).toEqual("verySecretKey1");
     });
   });
-
-  describe("online", () => {
-    beforeAll(() => {
-      jest.resetAllMocks();
-      jest.resetModules();
-      branch = process.env.BRANCH;
-    });
-    afterAll(() => {
-      process.env.BRANCH = branch;
-    });
-    it("does not set AWS config to defaults", () => {
-      process.env.BRANCH = "CVSB-test";
-      const handler = require("../../src/handler").handler;
-      handler({}, ctx, () => {
-        return;
-      });
-
-      const actual = AWSConfig.credentials;
-      // @ts-ignore
-      expect(actual.accessKeyId).not.toEqual("accessKey1");
-      // @ts-ignore
-      expect(actual.secretAccessKey).not.toEqual("verySecretKey1");
-    });
-  });
 });
