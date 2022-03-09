@@ -1,6 +1,6 @@
 // @ts-ignore
 import { NotifyClient } from "notifications-node-client";
-import {Configuration} from "../utils/Configuration";
+import { Configuration } from "../utils/Configuration";
 
 /**
  * Service class for Certificate Notifications

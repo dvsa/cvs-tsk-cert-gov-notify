@@ -95,20 +95,19 @@ class Configuration {
     return this.config.notify;
   }
 
-
   /**
    * Retrieves the templateId from environment variable
    */
   public async getTemplateIdFromEV(): Promise<string> {
-    if (!process.env.BRANCH || process.env.BRANCH === "local")  {
+    if (!process.env.BRANCH || process.env.BRANCH === "local") {
       if (!this.config.notify.templateId) {
         throw new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST);
       } else {
-        return this.config.notify.templateId
+        return this.config.notify.templateId;
       }
     } else {
       if (!process.env.TEMPLATE_ID) {
-      throw new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST);
+        throw new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST);
       }
       return process.env.TEMPLATE_ID;
     }
