@@ -1,32 +1,35 @@
 // @ts-ignore
 import { NotifyClient } from "notifications-node-client";
-import { TEMPLATEIDS } from "../assets/enum";
+import {Configuration} from "../utils/Configuration";
 
 /**
  * Service class for Certificate Notifications
  */
 class NotificationService {
   private readonly notifyClient: NotifyClient;
+  private readonly config: Configuration;
 
   constructor(notifyClient: NotifyClient) {
     this.notifyClient = notifyClient;
+    this.config = Configuration.getInstance();
   }
 
   /**
    * Sending email with the certificate according to the given params
    * @param params - personalization details,email and certificate
    */
-  public sendNotification(notifyPartialParams: any) {
+  public async sendNotification(notifyPartialParams: any) {
     const emailDetails = {
       personalisation: {
         ...notifyPartialParams.personalisation,
         link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.certificate),
       },
     };
+    const templateId = await this.config.getTemplateIdFromEV();
 
-    console.log(`Sent email using ${TEMPLATEIDS.CertificateEmail} templateId, ${notifyPartialParams.personalisation.test_type_name} test type name and ${notifyPartialParams.personalisation.date_of_issue} date of issue`);
+    console.log(`Sent email using ${templateId} templateId, ${notifyPartialParams.personalisation.test_type_name} test type name and ${notifyPartialParams.personalisation.date_of_issue} date of issue`);
     return this.notifyClient
-      .sendEmail(TEMPLATEIDS.CertificateEmail, notifyPartialParams.email, emailDetails)
+      .sendEmail(templateId, notifyPartialParams.email, emailDetails)
       .then((response: any) => {
         return response;
       })
