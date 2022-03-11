@@ -33,6 +33,7 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
     console.log(`SQS RECORD: ${JSON.stringify(sqsRecord)}`);
     const objectPutEvent: S3Event = JSON.parse(sqsRecord.body);
 
+    if (objectPutEvent.Records) {
     objectPutEvent.Records.forEach((s3Record: S3EventRecord) => {
       const s3Object: any = s3Record.s3.object;
       // Object key may have spaces or unicode non-ASCII characters.
@@ -46,6 +47,7 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
 
       notifyPromises.push(notifyPromise);
     });
+    }
   });
 
   return Promise.all(notifyPromises).catch((error: any) => {
