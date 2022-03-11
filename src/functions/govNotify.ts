@@ -28,9 +28,7 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
   const notifyService: NotificationService = new NotificationService(notifyClient);
   const notifyPromises: Array<Promise<any>> = [];
 
-  console.log(`EVENT.RECORDS: ${JSON.stringify(event.Records)}`);
   event.Records.forEach((sqsRecord: SQSRecord) => {
-    console.log(`SQS RECORD: ${JSON.stringify(sqsRecord)}`);
     const objectPutEvent: S3Event = JSON.parse(sqsRecord.body);
 
     if (objectPutEvent.Records) {
