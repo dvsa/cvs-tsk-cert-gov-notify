@@ -5,6 +5,7 @@ interface IInvokeConfig {
 
 interface INotifyConfig {
   api_key: string;
+  templateId: string;
 }
 
 interface IS3Config {

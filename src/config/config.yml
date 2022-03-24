@@ -25,3 +25,4 @@ s3:
   remote: {}
 notify:
   api_key:
+  templateId: ff36dae2-937e-4883-9e25-e776fa6af665
