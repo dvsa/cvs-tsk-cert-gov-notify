@@ -15,7 +15,7 @@ describe("NotificationService", () => {
   context("sendNotification()", () => {
     it("should return appropriate data", async () => {
       const prepareUploadFake = sinon.fake.returns("pathToThings");
-      const sendEmailFake = sinon.fake.resolves("it worked");
+      const sendEmailFake = sinon.fake.resolves({data: "it worked"});
       const notifyClientMock = { prepareUpload: prepareUploadFake, sendEmail: sendEmailFake };
       const notificationService: NotificationService = new NotificationService(notifyClientMock);
 
@@ -33,7 +33,6 @@ describe("NotificationService", () => {
         email: "testemail@testdomain.com",
         certificate: "certData",
       };
-
       const resp = await notificationService.sendNotification(params);
       expect(resp).toEqual("it worked");
       expect(prepareUploadFake.args[0]).toEqual([params.certificate]);
