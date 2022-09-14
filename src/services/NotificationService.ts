@@ -30,9 +30,7 @@ class NotificationService {
     console.log(`Sent email using ${templateId} templateId, ${notifyPartialParams.personalisation.test_type_name} test type name and ${notifyPartialParams.personalisation.date_of_issue} date of issue`);
     return this.notifyClient
       .sendEmail(templateId, notifyPartialParams.email, emailDetails)
-      .then((response: any) => {
-        return response;
-      })
+      .then((response: any) => response.data)
       .catch((err: any) => {
         console.error(err);
         throw err;
