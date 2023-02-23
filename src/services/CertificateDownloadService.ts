@@ -1,6 +1,7 @@
 import { Configuration } from "../utils/Configuration";
 import { S3BucketService } from "./S3BucketService";
 import S3 from "aws-sdk/clients/s3";
+import { IPartialParams } from "../models";
 
 /**
  * Service class for Certificate Generation
@@ -23,7 +24,8 @@ class CertificateDownloadService {
       .download(`cvs-cert-${process.env.BUCKET}`, fileName)
       .then((result: S3.Types.GetObjectOutput) => {
         console.log(`Downloading result: ${JSON.stringify(this.cleanForLogging(result))}`);
-        const notifyPartialParams = {
+        //TODO: refactor to a method
+        const notifyPartialParams: IPartialParams = {
           personalisation: {
             vrms: result.Metadata!.vrm,
             test_type_name: result.Metadata!["test-type-name"],
@@ -36,8 +38,8 @@ class CertificateDownloadService {
             file_size: result.Metadata!["file-size"],
           },
           email: result.Metadata!.email,
-          shouldEmailCertificate: result.Metadata!["should-email-certificate"],
-          certificate: result.Body,
+          shouldEmail: result.Metadata!["should-email-certificate"],
+          fileData: result.Body,
         };
         // console.log(`Notify partial params: ${JSON.stringify(notifyPartialParams)}`);
         return notifyPartialParams;

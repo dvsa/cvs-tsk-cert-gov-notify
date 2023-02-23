@@ -32,19 +32,20 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
     const objectPutEvent: S3Event = JSON.parse(sqsRecord.body);
 
     if (objectPutEvent.Records) {
-    objectPutEvent.Records.forEach((s3Record: S3EventRecord) => {
-      const s3Object: any = s3Record.s3.object;
-      // Object key may have spaces or unicode non-ASCII characters.
-      const decodedS3Key = decodeURIComponent(s3Object.key.replace(/\+/g, " "));
+      objectPutEvent.Records.forEach((s3Record: S3EventRecord) => {
+        const s3Object: any = s3Record.s3.object;
+        // Object key may have spaces or unicode non-ASCII characters.
+        const decodedS3Key = decodeURIComponent(s3Object.key.replace(/\+/g, " "));
 
-      const notifyPromise = downloadService.getCertificate(decodedS3Key).then((notifyPartialParams: any) => {
-        if (!notifyPartialParams.shouldEmailCertificate || notifyPartialParams.shouldEmailCertificate === "true") {
-          return notifyService.sendNotification(notifyPartialParams);
-        }
+        //TODO: create a proper type for notify partial params
+        const notifyPromise = downloadService.getCertificate(decodedS3Key).then((notifyPartialParams: any) => {
+          if (!notifyPartialParams.shouldEmailCertificate || notifyPartialParams.shouldEmailCertificate === "true") {
+            return notifyService.sendNotification(notifyPartialParams);
+          }
+        });
+
+        notifyPromises.push(notifyPromise);
       });
-
-      notifyPromises.push(notifyPromise);
-    });
     }
   });
 

@@ -32,4 +32,11 @@ interface IConfig {
   invoke: IIndexInvokeConfig;
 }
 
-export { IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig, IConfig };
+interface IPartialParams {
+  personalisation: any;
+  email: string;
+  shouldEmail: string;
+  fileData?: AWS.S3.Body;
+}
+
+export { IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig, IConfig, IPartialParams };

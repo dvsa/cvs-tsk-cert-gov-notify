@@ -99,6 +99,7 @@ class Configuration {
    * Retrieves the templateId from environment variable
    */
   public async getTemplateIdFromEV(): Promise<string> {
+    //TODO: vary this template ID to allow both plates and letters
     if (!process.env.BRANCH || process.env.BRANCH === "local") {
       if (!this.config.notify.templateId) {
         throw new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST);
