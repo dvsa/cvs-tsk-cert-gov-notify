@@ -75,7 +75,7 @@ class CertificateDownloadService {
     } else if (documentType === DocumentTypes.TRL_LETTER_INTO_SERVICE) {
       personalisation = {
         date_of_issue: result.Metadata!["date-of-issue"],
-        trailer_id: result.Metadata!["trailer_id"],
+        trailer_id: result.Metadata!["trailer-id"],
       };
     }
 
