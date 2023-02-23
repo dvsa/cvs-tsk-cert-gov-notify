@@ -22,7 +22,7 @@ describe("CertificateDownloadService", () => {
     files: ["1_1B7GG36N12S678410_1.base64"],
   });
   S3BucketMockService.setMetadata({
-    vrm: "BQ91YHQ",
+    "vrm": "BQ91YHQ",
     "test-type-name": "Annual test",
     "date-of-issue": "11 March 2019",
     "total-certs": "2",
@@ -31,7 +31,7 @@ describe("CertificateDownloadService", () => {
     "cert-index": "1",
     "file-format": "pdf",
     "file-size": "306784",
-    email: "testemail@testdomain.com",
+    "email": "testemail@testdomain.com",
   });
 
   context("getCertificate()", () => {

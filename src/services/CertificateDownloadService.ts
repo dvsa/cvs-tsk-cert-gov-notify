@@ -38,7 +38,7 @@ class CertificateDownloadService {
    * @param result
    * @returns set of notify params needed
    */
-  generateCertificatePartialParams(result: S3.Types.GetObjectOutput): IPartialParams {
+  public generateCertificatePartialParams(result: S3.Types.GetObjectOutput): IPartialParams {
     return {
       personalisation: {
         vrms: result.Metadata!.vrm,
@@ -63,7 +63,7 @@ class CertificateDownloadService {
    * @param result
    * @returns set of notify params needed
    */
-  generatePartialParams(result: S3.Types.GetObjectOutput): IPartialParams {
+  public generatePartialParams(result: S3.Types.GetObjectOutput): IPartialParams {
     let personalisation;
     const documentType: DocumentTypes = result.Metadata!["document-type"] as DocumentTypes;
 
@@ -73,7 +73,7 @@ class CertificateDownloadService {
         date_of_issue: result.Metadata!["date-of-issue"],
       };
     } else if (documentType === DocumentTypes.TRL_LETTER_INTO_SERVICE) {
-      //TODO: sort this out when we have a template made
+      // TODO: sort this out when we have a template made
       personalisation = {
         date_of_issue: result.Metadata!["date-of-issue"],
       };
@@ -83,7 +83,7 @@ class CertificateDownloadService {
       email: result.Metadata!.email,
       shouldEmail: result.Metadata!["should-email-certificate"],
       fileData: result.Body,
-      documentType: documentType,
+      documentType,
       personalisation,
     };
 
