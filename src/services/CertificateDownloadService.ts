@@ -67,7 +67,7 @@ class CertificateDownloadService {
     let personalisation;
     const documentType: DocumentTypes = result.Metadata!["document-type"] as DocumentTypes;
 
-    if (documentType === DocumentTypes.PLATE) {
+    if (documentType === DocumentTypes.MINISTRY_PLATE) {
       personalisation = {
         vrms: result.Metadata!.vrm,
         date_of_issue: result.Metadata!["date-of-issue"],

@@ -109,7 +109,7 @@ class Configuration {
       switch (templateType) {
         case DocumentTypes.CERTIFICATE:
           return process.env.CERTIFICATE_TEMPLATE_ID!;
-        case DocumentTypes.PLATE:
+        case DocumentTypes.MINISTRY_PLATE:
           return process.env.PLATE_TEMPLATE_ID!;
         case DocumentTypes.TRL_LETTER_INTO_SERVICE:
           return process.env.TRL_LETTER_INTO_SERVICE_TEMPLATE_ID!;
