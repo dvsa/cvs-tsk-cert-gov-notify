@@ -9,6 +9,7 @@ import { S3 } from "aws-sdk";
 import { NotifyClient } from "notifications-node-client";
 import { Configuration } from "../utils/Configuration";
 import { S3BucketService } from "../services/S3BucketService";
+import { IPartialParams } from "../models";
 
 /**
  * λ function to process an SQS record and initialise email notifications for generated certificates
@@ -37,9 +38,8 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
         // Object key may have spaces or unicode non-ASCII characters.
         const decodedS3Key = decodeURIComponent(s3Object.key.replace(/\+/g, " "));
 
-        //TODO: create a proper type for notify partial params
-        const notifyPromise = downloadService.getCertificate(decodedS3Key).then((notifyPartialParams: any) => {
-          if (!notifyPartialParams.shouldEmailCertificate || notifyPartialParams.shouldEmailCertificate === "true") {
+        const notifyPromise = downloadService.getCertificate(decodedS3Key).then((notifyPartialParams: IPartialParams) => {
+          if (!notifyPartialParams.shouldEmail || notifyPartialParams.shouldEmail === "true") {
             return notifyService.sendNotification(notifyPartialParams);
           }
         });
