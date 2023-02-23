@@ -1,6 +1,6 @@
 // @ts-ignore
 import * as yml from "node-yaml";
-import { DocumentTypes, IConfig, IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig } from "../models";
+import { DocumentTypes, IConfig, IInvokeConfig, INotifyConfig, IS3Config } from "../models";
 import { ERRORS } from "../assets/enum";
 import SecretsManager, { GetSecretValueRequest, GetSecretValueResponse } from "aws-sdk/clients/secretsmanager";
 import { safeLoad } from "js-yaml";

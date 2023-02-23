@@ -1,6 +1,7 @@
 import { NotificationService } from "../../src/services/NotificationService";
 import { Configuration } from "../../src/utils/Configuration";
 import sinon from "sinon";
+import { DocumentTypes, IPartialParams } from "../../src/models";
 
 describe("NotificationService", () => {
   const sandbox = sinon.createSandbox();
@@ -15,11 +16,11 @@ describe("NotificationService", () => {
   context("sendNotification()", () => {
     it("should return appropriate data", async () => {
       const prepareUploadFake = sinon.fake.returns("pathToThings");
-      const sendEmailFake = sinon.fake.resolves({data: "it worked"});
+      const sendEmailFake = sinon.fake.resolves({ data: "it worked" });
       const notifyClientMock = { prepareUpload: prepareUploadFake, sendEmail: sendEmailFake };
       const notificationService: NotificationService = new NotificationService(notifyClientMock);
 
-      const params = {
+      const params: IPartialParams = {
         personalisation: {
           vrms: "BQ91YHQ",
           test_type_name: "Annual test",
@@ -31,11 +32,13 @@ describe("NotificationService", () => {
           file_size: "306784",
         },
         email: "testemail@testdomain.com",
-        certificate: "certData",
+        fileData: "certData",
+        shouldEmail: "true",
+        documentType: DocumentTypes.CERTIFICATE,
       };
       const resp = await notificationService.sendNotification(params);
       expect(resp).toEqual("it worked");
-      expect(prepareUploadFake.args[0]).toEqual([params.certificate, { confirmEmailBeforeDownload: false }]);
+      expect(prepareUploadFake.args[0]).toEqual([params.fileData, { confirmEmailBeforeDownload: false }]);
     });
     it("should bubble up error if notify client prepareUpload method throws error", async () => {
       const prepareUploadFake = sinon.fake.throws("preparer: Oh No!");
@@ -55,7 +58,9 @@ describe("NotificationService", () => {
           file_size: "306784",
         },
         email: "testemail@testdomain.com",
-        certificate: "certData",
+        fileData: "certData",
+        shouldEmail: "true",
+        documentType: DocumentTypes.CERTIFICATE,
       };
 
       expect.assertions(1);
@@ -83,7 +88,9 @@ describe("NotificationService", () => {
           file_size: "306784",
         },
         email: "testemai@testdomain.com",
-        certificate: "certData",
+        fileData: "certData",
+        shouldEmail: "true",
+        documentType: DocumentTypes.CERTIFICATE,
       };
 
       expect.assertions(1);
