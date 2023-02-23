@@ -26,9 +26,9 @@ class NotificationService {
         link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.fileData, { confirmEmailBeforeDownload: false }),
       },
     };
-    const templateId = await this.config.getTemplateIdFromEV();
+    const templateId = await this.config.getTemplateIdFromEV(notifyPartialParams.documentType);
 
-    console.log(`Sent email using ${templateId} templateId, ${notifyPartialParams.personalisation.test_type_name} test type name and ${notifyPartialParams.personalisation.date_of_issue} date of issue`);
+    console.log(`Sent email using ${templateId} templateId, ${notifyPartialParams.documentType} with ${notifyPartialParams.personalisation.date_of_issue} date of issue`);
     return this.notifyClient
       .sendEmail(templateId, notifyPartialParams.email, emailDetails)
       .then((response: any) => response.data)

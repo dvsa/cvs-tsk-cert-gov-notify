@@ -37,6 +37,13 @@ interface IPartialParams {
   email: string;
   shouldEmail: string;
   fileData?: AWS.S3.Body;
+  documentType: DocumentTypes;
+}
+
+export enum DocumentTypes {
+  CERTIFICATE = "certificate",
+  PLATE = "plate",
+  TRL_LETTER_INTO_SERVICE = "trailer letter into service",
 }
 
 export { IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig, IConfig, IPartialParams };

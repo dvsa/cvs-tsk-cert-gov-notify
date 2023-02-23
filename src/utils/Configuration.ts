@@ -1,6 +1,6 @@
 // @ts-ignore
 import * as yml from "node-yaml";
-import { IConfig, IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig } from "../models";
+import { DocumentTypes, IConfig, IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig } from "../models";
 import { ERRORS } from "../assets/enum";
 import SecretsManager, { GetSecretValueRequest, GetSecretValueResponse } from "aws-sdk/clients/secretsmanager";
 import { safeLoad } from "js-yaml";
@@ -98,8 +98,7 @@ class Configuration {
   /**
    * Retrieves the templateId from environment variable
    */
-  public async getTemplateIdFromEV(): Promise<string> {
-    //TODO: vary this template ID to allow both plates and letters
+  public async getTemplateIdFromEV(templateType: DocumentTypes): Promise<string> {
     if (!process.env.BRANCH || process.env.BRANCH === "local") {
       if (!this.config.notify.templateId) {
         throw new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST);
@@ -107,10 +106,16 @@ class Configuration {
         return this.config.notify.templateId;
       }
     } else {
-      if (!process.env.TEMPLATE_ID) {
-        throw new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST);
+      switch (templateType) {
+        case DocumentTypes.CERTIFICATE:
+          return process.env.CERTIFICATE_TEMPLATE_ID!;
+        case DocumentTypes.PLATE:
+          return process.env.PLATE_TEMPLATE_ID!;
+        case DocumentTypes.TRL_LETTER_INTO_SERVICE:
+          return process.env.TRL_LETTER_INTO_SERVICE_TEMPLATE_ID!;
+        default:
+          throw new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST);
       }
-      return process.env.TEMPLATE_ID;
     }
   }
 
