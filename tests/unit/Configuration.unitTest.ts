@@ -106,14 +106,14 @@ describe("Configuration", () => {
   });
   context("When calling getTemplateIdFromEv and the branch is local", () => {
     it("should not throw an error when templateId does exist", async () => {
-      await config.getTemplateIdFromEV(DocumentTypes.CERTIFICATE).then((x) => {
+      await config.getTemplateIdFromEV("certificate" as unknown as DocumentTypes).then((x) => {
         console.log(x);
         expect(x).toEqual("ff36dae2-937e-4883-9e25-e776fa6af665");
       });
     });
 
     it("should throw an error when templateId doesn't exist in config file", async () => {
-      await badConfig.getTemplateIdFromEV(DocumentTypes.CERTIFICATE).catch((x) => {
+      await badConfig.getTemplateIdFromEV("certificate" as unknown as DocumentTypes).catch((x) => {
         expect(x).toEqual(mockError);
       });
     });
@@ -121,8 +121,8 @@ describe("Configuration", () => {
   context("When calling getTemplateIdFromEv and branch isn't local", () => {
     it("should not throw and error when templateId is populated", async () => {
       process.env.BRANCH = "remote";
-      process.env.TEMPLATE_ID = "ff36dae2-937e-4883-9e25-e776fa6aaf665";
-      await config.getTemplateIdFromEV(DocumentTypes.CERTIFICATE).then((x) => {
+      process.env.CERTIFICATE_TEMPLATE_ID = "ff36dae2-937e-4883-9e25-e776fa6aaf665";
+      await config.getTemplateIdFromEV("certificate" as unknown as DocumentTypes).then((x) => {
         expect(x).toEqual("ff36dae2-937e-4883-9e25-e776fa6aaf665");
       });
     });
@@ -130,8 +130,8 @@ describe("Configuration", () => {
   context("When calling getTemplateIdFromEv and branch isn't local", () => {
     it("should throw an error when templateId does not exist", async () => {
       process.env.BRANCH = "remote";
-      process.env.TEMPLATE_ID = undefined;
-      await config.getTemplateIdFromEV(DocumentTypes.CERTIFICATE).catch((x) => {
+      process.env.CERTIFICATE_TEMPLATE_ID = undefined;
+      await config.getTemplateIdFromEV("certificate" as unknown as DocumentTypes).catch((x) => {
         expect(x).toEqual(mockError);
       });
     });

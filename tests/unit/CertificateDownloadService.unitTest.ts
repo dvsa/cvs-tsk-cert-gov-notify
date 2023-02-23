@@ -22,7 +22,7 @@ describe("CertificateDownloadService", () => {
     files: ["1_1B7GG36N12S678410_1.base64"],
   });
   S3BucketMockService.setMetadata({
-    "vrm": "BQ91YHQ",
+    vrm: "BQ91YHQ",
     "test-type-name": "Annual test",
     "date-of-issue": "11 March 2019",
     "total-certs": "2",
@@ -31,7 +31,8 @@ describe("CertificateDownloadService", () => {
     "cert-index": "1",
     "file-format": "pdf",
     "file-size": "306784",
-    "email": "testemail@testdomain.com",
+    "should-email-certificate": "true",
+    email: "testemail@testdomain.com",
   });
 
   context("getCertificate()", () => {
@@ -49,7 +50,9 @@ describe("CertificateDownloadService", () => {
           file_size: "306784",
         },
         email: "testemail@testdomain.com",
-        certificate: fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/1_1B7GG36N12S678410_1.base64`)),
+        fileData: fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/1_1B7GG36N12S678410_1.base64`)),
+        shouldEmail: "true",
+        documentType: "certificate",
       };
       expect.assertions(1);
       const response = await certificateDownloadService.getCertificate("1_1B7GG36N12S678410_1.base64");

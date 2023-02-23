@@ -34,7 +34,7 @@ describe("NotificationService", () => {
         email: "testemail@testdomain.com",
         fileData: "certData",
         shouldEmail: "true",
-        documentType: DocumentTypes.CERTIFICATE,
+        documentType: "certificate" as unknown as DocumentTypes,
       };
       const resp = await notificationService.sendNotification(params);
       expect(resp).toEqual("it worked");
@@ -60,7 +60,7 @@ describe("NotificationService", () => {
         email: "testemail@testdomain.com",
         fileData: "certData",
         shouldEmail: "true",
-        documentType: DocumentTypes.CERTIFICATE,
+        documentType: "certificate" as unknown as DocumentTypes,
       };
 
       expect.assertions(1);
@@ -90,7 +90,7 @@ describe("NotificationService", () => {
         email: "testemai@testdomain.com",
         fileData: "certData",
         shouldEmail: "true",
-        documentType: DocumentTypes.CERTIFICATE,
+        documentType: "certificate" as unknown as DocumentTypes,
       };
 
       expect.assertions(1);

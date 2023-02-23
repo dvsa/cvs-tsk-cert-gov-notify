@@ -40,10 +40,10 @@ interface IPartialParams {
   documentType: DocumentTypes;
 }
 
-export enum DocumentTypes {
+enum DocumentTypes {
   CERTIFICATE = "certificate",
   PLATE = "plate",
   TRL_LETTER_INTO_SERVICE = "trailer letter into service",
 }
 
-export { IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig, IConfig, IPartialParams };
+export { IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig, IConfig, IPartialParams, DocumentTypes };

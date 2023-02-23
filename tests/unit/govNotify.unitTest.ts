@@ -57,7 +57,7 @@ describe("gov-notify", () => {
 
       context("and the S3 metadata object has shouldSendCertificate set to true", () => {
         it("should call the sendNotification function and send", () => {
-          CertificateDownloadService.prototype.getCertificate = jest.fn().mockResolvedValue({ shouldEmailCertificate: "true" });
+          CertificateDownloadService.prototype.getCertificate = jest.fn().mockResolvedValue({ shouldEmail: "true" });
           NotificationService.prototype.sendNotification = jest.fn().mockResolvedValue("sent notification");
           return lambdaTester(handler)
             .event(event)
@@ -70,7 +70,7 @@ describe("gov-notify", () => {
 
       context("and the S3 metadata object doesn't have shouldSendCertificate property", () => {
         it("should call the sendNotification function", () => {
-          CertificateDownloadService.prototype.getCertificate = jest.fn().mockResolvedValue({ shouldEmailCertificate: "true" });
+          CertificateDownloadService.prototype.getCertificate = jest.fn().mockResolvedValue({ shouldEmail: "true" });
           NotificationService.prototype.sendNotification = jest.fn().mockResolvedValue("sent notification");
           return lambdaTester(handler)
             .event(event)
@@ -83,7 +83,7 @@ describe("gov-notify", () => {
 
       context("and the S3 metadata object has shouldSendCertificate set to false", () => {
         it("should call the sendNotification function", () => {
-          CertificateDownloadService.prototype.getCertificate = jest.fn().mockResolvedValue({ shouldEmailCertificate: "false" });
+          CertificateDownloadService.prototype.getCertificate = jest.fn().mockResolvedValue({ shouldEmail: "false" });
           NotificationService.prototype.sendNotification = jest.fn().mockResolvedValue("sent notification");
           return lambdaTester(handler)
             .event(event)
