@@ -111,8 +111,8 @@ class Configuration {
           return process.env.CERTIFICATE_TEMPLATE_ID!;
         case DocumentTypes.MINISTRY_PLATE:
           return process.env.PLATE_TEMPLATE_ID!;
-        case DocumentTypes.TRL_LETTER_INTO_SERVICE:
-          return process.env.TRL_LETTER_INTO_SERVICE_TEMPLATE_ID!;
+        case DocumentTypes.TRAILER_INTO_SERVICE:
+          return process.env.TRAILER_INTO_SERVICE_TEMPLATE_ID!;
         default:
           throw new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST);
       }

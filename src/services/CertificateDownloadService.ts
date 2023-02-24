@@ -72,7 +72,7 @@ class CertificateDownloadService {
         vrms: result.Metadata!.vrm,
         date_of_issue: result.Metadata!["date-of-issue"],
       };
-    } else if (documentType === DocumentTypes.TRL_LETTER_INTO_SERVICE) {
+    } else if (documentType === DocumentTypes.TRAILER_INTO_SERVICE) {
       personalisation = {
         date_of_issue: result.Metadata!["date-of-issue"],
         trailer_id: result.Metadata!["trailer-id"],

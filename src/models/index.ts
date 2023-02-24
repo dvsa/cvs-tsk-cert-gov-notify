@@ -43,7 +43,7 @@ interface IPartialParams {
 enum DocumentTypes {
   CERTIFICATE = "certificate",
   MINISTRY_PLATE = "VTG6_VTG7",
-  TRL_LETTER_INTO_SERVICE = "TrailerIntoService",
+  TRAILER_INTO_SERVICE = "TrailerIntoService",
 }
 
 export { IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig, IConfig, IPartialParams, DocumentTypes };
