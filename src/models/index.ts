@@ -32,4 +32,18 @@ interface IConfig {
   invoke: IIndexInvokeConfig;
 }
 
-export { IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig, IConfig };
+interface IPartialParams {
+  personalisation: any;
+  email: string;
+  shouldEmail: string;
+  fileData?: AWS.S3.Body;
+  documentType: DocumentTypes;
+}
+
+enum DocumentTypes {
+  CERTIFICATE = "certificate",
+  MINISTRY_PLATE = "VTG6_VTG7",
+  TRAILER_INTO_SERVICE = "TrailerIntoService",
+}
+
+export { IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig, IConfig, IPartialParams, DocumentTypes };

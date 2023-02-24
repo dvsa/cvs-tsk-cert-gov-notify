@@ -9,6 +9,7 @@ import { S3 } from "aws-sdk";
 import { NotifyClient } from "notifications-node-client";
 import { Configuration } from "../utils/Configuration";
 import { S3BucketService } from "../services/S3BucketService";
+import { IPartialParams } from "../models";
 
 /**
  * λ function to process an SQS record and initialise email notifications for generated certificates
@@ -32,19 +33,19 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
     const objectPutEvent: S3Event = JSON.parse(sqsRecord.body);
 
     if (objectPutEvent.Records) {
-    objectPutEvent.Records.forEach((s3Record: S3EventRecord) => {
-      const s3Object: any = s3Record.s3.object;
-      // Object key may have spaces or unicode non-ASCII characters.
-      const decodedS3Key = decodeURIComponent(s3Object.key.replace(/\+/g, " "));
+      objectPutEvent.Records.forEach((s3Record: S3EventRecord) => {
+        const s3Object: any = s3Record.s3.object;
+        // Object key may have spaces or unicode non-ASCII characters.
+        const decodedS3Key = decodeURIComponent(s3Object.key.replace(/\+/g, " "));
 
-      const notifyPromise = downloadService.getCertificate(decodedS3Key).then((notifyPartialParams: any) => {
-        if (!notifyPartialParams.shouldEmailCertificate || notifyPartialParams.shouldEmailCertificate === "true") {
-          return notifyService.sendNotification(notifyPartialParams);
-        }
+        const notifyPromise = downloadService.getCertificate(decodedS3Key).then((notifyPartialParams: IPartialParams) => {
+          if (!notifyPartialParams.shouldEmail || notifyPartialParams.shouldEmail === "true") {
+            return notifyService.sendNotification(notifyPartialParams);
+          }
+        });
+
+        notifyPromises.push(notifyPromise);
       });
-
-      notifyPromises.push(notifyPromise);
-    });
     }
   });
 

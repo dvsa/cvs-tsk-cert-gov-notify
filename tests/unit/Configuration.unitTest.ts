@@ -1,12 +1,12 @@
 import { Configuration } from "../../src/utils/Configuration";
-import { IS3Config } from "../../src/models";
+import { DocumentTypes, IS3Config } from "../../src/models";
 import { safeDump } from "js-yaml";
 import * as fs from "fs";
 import * as AWSMock from "aws-sdk-mock";
 import { fake, SinonSpy } from "sinon";
 import { GetSecretValueResponse } from "aws-sdk/clients/secretsmanager";
 import AWS = require("aws-sdk");
-import {ERRORS} from "../../src/assets/enum";
+import { ERRORS } from "../../src/assets/enum";
 
 describe("Configuration", () => {
   let branch: string | undefined = "";
@@ -106,23 +106,23 @@ describe("Configuration", () => {
   });
   context("When calling getTemplateIdFromEv and the branch is local", () => {
     it("should not throw an error when templateId does exist", async () => {
-      await config.getTemplateIdFromEV().then((x) => {
+      await config.getTemplateIdFromEV("certificate" as unknown as DocumentTypes).then((x) => {
         console.log(x);
         expect(x).toEqual("ff36dae2-937e-4883-9e25-e776fa6af665");
       });
     });
 
     it("should throw an error when templateId doesn't exist in config file", async () => {
-      await badConfig.getTemplateIdFromEV().catch((x) => {
-          expect(x).toEqual(mockError);
+      await badConfig.getTemplateIdFromEV("certificate" as unknown as DocumentTypes).catch((x) => {
+        expect(x).toEqual(mockError);
       });
     });
   });
   context("When calling getTemplateIdFromEv and branch isn't local", () => {
     it("should not throw and error when templateId is populated", async () => {
       process.env.BRANCH = "remote";
-      process.env.TEMPLATE_ID = "ff36dae2-937e-4883-9e25-e776fa6aaf665";
-      await config.getTemplateIdFromEV().then((x) => {
+      process.env.CERTIFICATE_TEMPLATE_ID = "ff36dae2-937e-4883-9e25-e776fa6aaf665";
+      await config.getTemplateIdFromEV("certificate" as unknown as DocumentTypes).then((x) => {
         expect(x).toEqual("ff36dae2-937e-4883-9e25-e776fa6aaf665");
       });
     });
@@ -130,8 +130,8 @@ describe("Configuration", () => {
   context("When calling getTemplateIdFromEv and branch isn't local", () => {
     it("should throw an error when templateId does not exist", async () => {
       process.env.BRANCH = "remote";
-      process.env.TEMPLATE_ID = undefined;
-      await config.getTemplateIdFromEV().catch((x) => {
+      process.env.CERTIFICATE_TEMPLATE_ID = undefined;
+      await config.getTemplateIdFromEV("certificate" as unknown as DocumentTypes).catch((x) => {
         expect(x).toEqual(mockError);
       });
     });

@@ -31,6 +31,7 @@ describe("CertificateDownloadService", () => {
     "cert-index": "1",
     "file-format": "pdf",
     "file-size": "306784",
+    "should-email-certificate": "true",
     email: "testemail@testdomain.com",
   });
 
@@ -49,7 +50,9 @@ describe("CertificateDownloadService", () => {
           file_size: "306784",
         },
         email: "testemail@testdomain.com",
-        certificate: fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/1_1B7GG36N12S678410_1.base64`)),
+        fileData: fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/1_1B7GG36N12S678410_1.base64`)),
+        shouldEmail: "true",
+        documentType: "certificate",
       };
       expect.assertions(1);
       const response = await certificateDownloadService.getCertificate("1_1B7GG36N12S678410_1.base64");
