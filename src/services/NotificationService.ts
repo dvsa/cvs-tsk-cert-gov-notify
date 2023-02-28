@@ -1,5 +1,6 @@
 // @ts-ignore
 import { NotifyClient } from "notifications-node-client";
+import { IPartialParams } from "../models";
 import { Configuration } from "../utils/Configuration";
 
 /**
@@ -18,16 +19,17 @@ class NotificationService {
    * Sending email with the certificate according to the given params
    * @param params - personalization details,email and certificate
    */
-  public async sendNotification(notifyPartialParams: any) {
+  public async sendNotification(notifyPartialParams: IPartialParams) {
     const emailDetails = {
       personalisation: {
         ...notifyPartialParams.personalisation,
-        link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.certificate, {confirmEmailBeforeDownload: false}),
+        link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.fileData, { confirmEmailBeforeDownload: false }),
       },
     };
-    const templateId = await this.config.getTemplateIdFromEV();
+    const templateId = await this.config.getTemplateIdFromEV(notifyPartialParams.documentType);
 
-    console.log(`Sent email using ${templateId} templateId, ${notifyPartialParams.personalisation.test_type_name} test type name and ${notifyPartialParams.personalisation.date_of_issue} date of issue`);
+    console.log(`Sent email using ${templateId} templateId, ${notifyPartialParams.documentType} with ${notifyPartialParams.personalisation.date_of_issue} date of issue`);
+    console.log(`Personalisation params: ${JSON.stringify(notifyPartialParams.personalisation)} + email ${notifyPartialParams.email}`);
     return this.notifyClient
       .sendEmail(templateId, notifyPartialParams.email, emailDetails)
       .then((response: any) => response.data)

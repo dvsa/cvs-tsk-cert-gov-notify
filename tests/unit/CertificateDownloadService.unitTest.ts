@@ -4,6 +4,7 @@ import { CertificateDownloadService } from "../../src/services/CertificateDownlo
 import { S3BucketMockService } from "../models/S3BucketMockService";
 import sinon from "sinon";
 import { Configuration } from "../../src/utils/Configuration";
+import { S3 } from "aws-sdk";
 
 describe("CertificateDownloadService", () => {
   const sandbox = sinon.createSandbox();
@@ -22,7 +23,7 @@ describe("CertificateDownloadService", () => {
     files: ["1_1B7GG36N12S678410_1.base64"],
   });
   S3BucketMockService.setMetadata({
-    vrm: "BQ91YHQ",
+    "vrm": "BQ91YHQ",
     "test-type-name": "Annual test",
     "date-of-issue": "11 March 2019",
     "total-certs": "2",
@@ -31,7 +32,8 @@ describe("CertificateDownloadService", () => {
     "cert-index": "1",
     "file-format": "pdf",
     "file-size": "306784",
-    email: "testemail@testdomain.com",
+    "should-email-certificate": "true",
+    "email": "testemail@testdomain.com",
   });
 
   context("getCertificate()", () => {
@@ -49,7 +51,9 @@ describe("CertificateDownloadService", () => {
           file_size: "306784",
         },
         email: "testemail@testdomain.com",
-        certificate: fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/1_1B7GG36N12S678410_1.base64`)),
+        fileData: fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/1_1B7GG36N12S678410_1.base64`)),
+        shouldEmail: "true",
+        documentType: "certificate",
       };
       expect.assertions(1);
       const response = await certificateDownloadService.getCertificate("1_1B7GG36N12S678410_1.base64");
@@ -93,6 +97,62 @@ describe("CertificateDownloadService", () => {
       };
       const response = certificateDownloadService.cleanForLogging(input);
       expect(response).toEqual(expectedOutput);
+    });
+  });
+
+  context("generatePartialParams()", () => {
+    it("should return a partial params for a plate", () => {
+      const expectedParams = {
+        email: "test@test.com",
+        shouldEmail: "true",
+        fileData: "1234",
+        documentType: "VTG6_VTG7",
+        personalisation: {
+          vrms: "12345",
+          date_of_issue: "12345",
+        },
+      };
+
+      const result: S3.Types.GetObjectOutput = {
+        Metadata: {
+          "document-type": "VTG6_VTG7",
+          "vrm": "12345",
+          "date-of-issue": "12345",
+          "email": "test@test.com",
+          "should-email-certificate": "true",
+        },
+        Body: "1234",
+      };
+
+      const res = certificateDownloadService.generatePartialParams(result);
+      expect(res).toStrictEqual(expectedParams);
+    });
+
+    it("should return a partial params for a letter", () => {
+      const expectedParams = {
+        email: "test@test.com",
+        shouldEmail: "true",
+        fileData: "1234",
+        documentType: "TrailerIntoService",
+        personalisation: {
+          trailer_id: "12345",
+          date_of_issue: "12345",
+        },
+      };
+
+      const result: S3.Types.GetObjectOutput = {
+        Metadata: {
+          "document-type": "TrailerIntoService",
+          "date-of-issue": "12345",
+          "email": "test@test.com",
+          "should-email-certificate": "true",
+          "trailer-id": "12345",
+        },
+        Body: "1234",
+      };
+
+      const res = certificateDownloadService.generatePartialParams(result);
+      expect(res).toStrictEqual(expectedParams);
     });
   });
 });

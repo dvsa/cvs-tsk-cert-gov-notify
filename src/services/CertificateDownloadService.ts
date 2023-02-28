@@ -1,6 +1,7 @@
 import { Configuration } from "../utils/Configuration";
 import { S3BucketService } from "./S3BucketService";
 import S3 from "aws-sdk/clients/s3";
+import { DocumentTypes, IPartialParams } from "../models";
 
 /**
  * Service class for Certificate Generation
@@ -23,29 +24,70 @@ class CertificateDownloadService {
       .download(`cvs-cert-${process.env.BUCKET}`, fileName)
       .then((result: S3.Types.GetObjectOutput) => {
         console.log(`Downloading result: ${JSON.stringify(this.cleanForLogging(result))}`);
-        const notifyPartialParams = {
-          personalisation: {
-            vrms: result.Metadata!.vrm,
-            test_type_name: result.Metadata!["test-type-name"],
-            date_of_issue: result.Metadata!["date-of-issue"],
-            cert_index: result.Metadata!["cert-index"],
-            total_certs: result.Metadata!["total-certs"],
-            test_type_result: result.Metadata!["test-type-result"],
-            cert_type: result.Metadata!["cert-type"],
-            file_format: result.Metadata!["file-format"],
-            file_size: result.Metadata!["file-size"],
-          },
-          email: result.Metadata!.email,
-          shouldEmailCertificate: result.Metadata!["should-email-certificate"],
-          certificate: result.Body,
-        };
-        // console.log(`Notify partial params: ${JSON.stringify(notifyPartialParams)}`);
-        return notifyPartialParams;
+
+        return result.Metadata!["cert-type"] ? this.generateCertificatePartialParams(result) : this.generatePartialParams(result);
       })
       .catch((error) => {
         console.error(error);
         throw error;
       });
+  }
+
+  /**
+   * this method is used to generate the data needed just for certificates only
+   * @param result
+   * @returns set of notify params needed
+   */
+  public generateCertificatePartialParams(result: S3.Types.GetObjectOutput): IPartialParams {
+    return {
+      personalisation: {
+        vrms: result.Metadata!.vrm,
+        test_type_name: result.Metadata!["test-type-name"],
+        date_of_issue: result.Metadata!["date-of-issue"],
+        cert_index: result.Metadata!["cert-index"],
+        total_certs: result.Metadata!["total-certs"],
+        test_type_result: result.Metadata!["test-type-result"],
+        cert_type: result.Metadata!["cert-type"],
+        file_format: result.Metadata!["file-format"],
+        file_size: result.Metadata!["file-size"],
+      },
+      email: result.Metadata!.email,
+      shouldEmail: result.Metadata!["should-email-certificate"],
+      fileData: result.Body,
+      documentType: DocumentTypes.CERTIFICATE,
+    };
+  }
+
+  /**
+   * this method is used to generate the data needed based on the provided document type
+   * @param result
+   * @returns set of notify params needed
+   */
+  public generatePartialParams(result: S3.Types.GetObjectOutput): IPartialParams {
+    let personalisation;
+    const documentType: DocumentTypes = result.Metadata!["document-type"] as DocumentTypes;
+
+    if (documentType === DocumentTypes.MINISTRY_PLATE) {
+      personalisation = {
+        vrms: result.Metadata!.vrm,
+        date_of_issue: result.Metadata!["date-of-issue"],
+      };
+    } else if (documentType === DocumentTypes.TRAILER_INTO_SERVICE) {
+      personalisation = {
+        date_of_issue: result.Metadata!["date-of-issue"],
+        trailer_id: result.Metadata!["trailer-id"],
+      };
+    }
+
+    const partialParams = {
+      email: result.Metadata!.email,
+      shouldEmail: result.Metadata!["should-email-certificate"],
+      fileData: result.Body,
+      documentType,
+      personalisation,
+    };
+
+    return partialParams;
   }
 
   /**
