@@ -9,7 +9,7 @@ import { S3 } from "aws-sdk";
 import { NotifyClient } from "notifications-node-client";
 import { Configuration } from "../utils/Configuration";
 import { S3BucketService } from "../services/S3BucketService";
-import { IPartialParams } from "../models";
+import { DocumentTypes, IPartialParams } from "../models";
 
 /**
  * λ function to process an SQS record and initialise email notifications for generated certificates
@@ -40,7 +40,16 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
 
         const notifyPromise = downloadService.getCertificate(decodedS3Key).then((notifyPartialParams: IPartialParams) => {
           if (!notifyPartialParams.shouldEmail || notifyPartialParams.shouldEmail === "true") {
-            return notifyService.sendNotification(notifyPartialParams);
+            if (notifyPartialParams.documentType === DocumentTypes.TFL_FEED) {
+              const emailList = notifyPartialParams.email.split(",");
+              emailList.forEach((email) => {
+                notifyPartialParams.email = email;
+                notifyService.sendNotification(notifyPartialParams);
+              });
+              return;
+            } else {
+              return notifyService.sendNotification(notifyPartialParams);
+            }
           }
         });
 
