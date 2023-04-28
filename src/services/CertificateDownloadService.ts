@@ -92,6 +92,11 @@ class CertificateDownloadService {
     return partialParams;
   }
 
+  /**
+   * this method is used to generate the data needed just for TFL only
+   * @param result
+   * @returns set of notify params needed
+   */
   public generateTFLFeedParams(result: S3.Types.GetObjectOutput): IPartialParams {
     return {
       email: process.env.TFL_EMAIL_LIST!,
