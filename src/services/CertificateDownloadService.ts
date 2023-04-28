@@ -20,14 +20,14 @@ class CertificateDownloadService {
    * @param fileName - the file name of the certificate you want to download
    */
   public getCertificate(fileName: string) {
-    const bucket = fileName.includes("VOSA") ? "cvs-enquiry-document-feed-" : "cvs-cert-";
+    const bucket = fileName.includes("VOSA") ? "cvs-enquiry-document-feed" : "cvs-cert";
 
     return this.s3Client
       .download(`${bucket}-${process.env.BUCKET}`, fileName)
       .then((result: S3.Types.GetObjectOutput) => {
         console.log(`Downloading result: ${JSON.stringify(this.cleanForLogging(result))}`);
 
-        return bucket === "cvs-enquiry-document-feed-" ? this.generateTFLFeedParams(result) : result.Metadata!["cert-type"] ? this.generateCertificatePartialParams(result) : this.generatePartialParams(result);
+        return bucket === "cvs-enquiry-document-feed" ? this.generateTFLFeedParams(result) : result.Metadata!["cert-type"] ? this.generateCertificatePartialParams(result) : this.generatePartialParams(result);
       })
       .catch((error) => {
         console.error(error);
