@@ -3,6 +3,7 @@ import { handler } from "../../src/handler";
 import { Configuration } from "../../src/utils/Configuration";
 import { CertificateDownloadService } from "../../src/services/CertificateDownloadService";
 import { NotificationService } from "../../src/services/NotificationService";
+import { DocumentTypes } from "../../src/models";
 
 describe("gov-notify", () => {
   const event = {
@@ -63,6 +64,19 @@ describe("gov-notify", () => {
             .event(event)
             .expectResolve((result: any) => {
               expect(result[0]).toEqual("sent notification");
+              expect(NotificationService.prototype.sendNotification).toHaveBeenCalled();
+            });
+        });
+      });
+
+      context("and the S3 metadata object has documentType of TFL", () => {
+        it("should call the sendNotification function and send", () => {
+          CertificateDownloadService.prototype.getCertificate = jest.fn().mockResolvedValue({ email: "email1@email.com,email2@email.com", shouldEmail: "true", documentType: DocumentTypes.TFL_FEED });
+          NotificationService.prototype.sendNotification = jest.fn().mockResolvedValue("sent notification");
+          return lambdaTester(handler)
+            .event(event)
+            .expectResolve((result: any) => {
+              expect(result[0]).toEqual("sent all notifications");
               expect(NotificationService.prototype.sendNotification).toHaveBeenCalled();
             });
         });
