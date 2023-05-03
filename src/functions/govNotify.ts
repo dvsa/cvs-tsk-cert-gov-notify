@@ -61,8 +61,6 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
     }
   });
 
-  console.log(notifyPromises, JSON.stringify(notifyPromises));
-
   return Promise.all(notifyPromises).catch((error: any) => {
     console.error(error);
     throw error;
