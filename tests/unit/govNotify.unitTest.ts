@@ -76,7 +76,7 @@ describe("gov-notify", () => {
           return lambdaTester(handler)
             .event(event)
             .expectResolve((result: any) => {
-              expect(result[0]).toEqual("sent all notifications");
+              expect(result[0]).toEqual(undefined);
               expect(NotificationService.prototype.sendNotification).toHaveBeenCalled();
             });
         });

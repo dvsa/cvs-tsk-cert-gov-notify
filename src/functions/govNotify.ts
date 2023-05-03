@@ -38,15 +38,20 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
         // Object key may have spaces or unicode non-ASCII characters.
         const decodedS3Key = decodeURIComponent(s3Object.key.replace(/\+/g, " "));
 
-        const notifyPromise = downloadService.getCertificate(decodedS3Key).then(async (notifyPartialParams: IPartialParams) => {
+        const notifyPromise = downloadService.getCertificate(decodedS3Key).then((notifyPartialParams: IPartialParams) => {
           if (!notifyPartialParams.shouldEmail || notifyPartialParams.shouldEmail === "true") {
             if (notifyPartialParams.documentType === DocumentTypes.TFL_FEED) {
               const emailList = notifyPartialParams.email.split(",");
-              await emailList.forEach((email) => {
-                notifyPartialParams.email = email;
-                notifyPromises.push(notifyService.sendNotification(notifyPartialParams));
+              const promise = new Promise<void>((resolve, reject) => {
+                emailList.forEach((email, index, array) => {
+                  notifyPartialParams.email = email;
+                  notifyPromises.push(notifyService.sendNotification(notifyPartialParams));
+                  if (index === array.length - 1) resolve();
+                });
               });
-              return "sent all notifications";
+              promise.then(() => {
+                return "sent all notifications";
+              });
             } else {
               return notifyService.sendNotification(notifyPartialParams);
             }
@@ -58,7 +63,7 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
     }
   });
 
-  console.log(notifyPromises);
+  console.log(notifyPromises, JSON.stringify(notifyPromises));
 
   return Promise.all(notifyPromises).catch((error: any) => {
     console.error(error);
