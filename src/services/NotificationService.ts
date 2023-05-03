@@ -32,7 +32,10 @@ class NotificationService {
     console.log(`Personalisation params: ${JSON.stringify(notifyPartialParams.personalisation)} + email ${notifyPartialParams.email}`);
     return this.notifyClient
       .sendEmail(templateId, notifyPartialParams.email, emailDetails)
-      .then((response: any) => response.data)
+      .then((response: any) => {
+        console.log(response);
+        return response.data;
+      })
       .catch((err: any) => {
         console.error(err);
         throw err;
