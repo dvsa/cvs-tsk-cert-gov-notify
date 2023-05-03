@@ -34,7 +34,7 @@ class NotificationService {
       .sendEmail(templateId, notifyPartialParams.email, emailDetails)
       .then((response: any) => {
         console.log(response);
-        response.data;
+        return response.data;
       })
       .catch((err: any) => {
         console.error(err);
