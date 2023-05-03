@@ -38,27 +38,25 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
         // Object key may have spaces or unicode non-ASCII characters.
         const decodedS3Key = decodeURIComponent(s3Object.key.replace(/\+/g, " "));
 
-        const notifyPromise = downloadService.getCertificate(decodedS3Key).then((notifyPartialParams: IPartialParams) => {
-          if (!notifyPartialParams.shouldEmail || notifyPartialParams.shouldEmail === "true") {
-            if (notifyPartialParams.documentType === DocumentTypes.TFL_FEED) {
-              const emailList = notifyPartialParams.email.split(",");
-              const promise = new Promise<void>((resolve, reject) => {
-                emailList.forEach((email, index, array) => {
-                  notifyPartialParams.email = email;
-                  notifyPromises.push(notifyService.sendNotification(notifyPartialParams));
-                  if (index === array.length - 1) resolve();
-                });
-              });
-              promise.then(() => {
-                return "sent all notifications";
-              });
-            } else {
+        if (decodedS3Key.includes("VOSA")) {
+          const emailList = process.env.TFL_EMAIL_LIST?.split(",");
+          emailList?.forEach((email) => {
+            const notifyPromise = downloadService.getCertificate(decodedS3Key).then((notifyPartialParams: IPartialParams) => {
+              if (!notifyPartialParams.shouldEmail || notifyPartialParams.shouldEmail === "true") {
+                notifyPartialParams.email = email;
+                return notifyService.sendNotification(notifyPartialParams);
+              }
+            });
+            notifyPromises.push(notifyPromise);
+          });
+        } else {
+          const notifyPromise = downloadService.getCertificate(decodedS3Key).then((notifyPartialParams: IPartialParams) => {
+            if (!notifyPartialParams.shouldEmail || notifyPartialParams.shouldEmail === "true") {
               return notifyService.sendNotification(notifyPartialParams);
             }
-          }
-        });
-
-        notifyPromises.push(notifyPromise);
+          });
+          notifyPromises.push(notifyPromise);
+        }
       });
     }
   });

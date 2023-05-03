@@ -99,7 +99,7 @@ class CertificateDownloadService {
    */
   public generateTFLFeedParams(result: S3.Types.GetObjectOutput): IPartialParams {
     return {
-      email: process.env.TFL_EMAIL_LIST!,
+      email: "",
       shouldEmail: "true",
       fileData: result.Body,
       documentType: DocumentTypes.TFL_FEED,
