@@ -44,7 +44,7 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
               const emailList = notifyPartialParams.email.split(",");
               emailList.forEach((email) => {
                 notifyPartialParams.email = email;
-                notifyService.sendNotification(notifyPartialParams);
+                notifyPromises.push(notifyService.sendNotification(notifyPartialParams));
               });
               return "sent all notifications";
             } else {
