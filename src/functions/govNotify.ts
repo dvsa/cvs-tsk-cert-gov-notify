@@ -38,11 +38,11 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
         // Object key may have spaces or unicode non-ASCII characters.
         const decodedS3Key = decodeURIComponent(s3Object.key.replace(/\+/g, " "));
 
-        const notifyPromise = downloadService.getCertificate(decodedS3Key).then((notifyPartialParams: IPartialParams) => {
+        const notifyPromise = downloadService.getCertificate(decodedS3Key).then(async (notifyPartialParams: IPartialParams) => {
           if (!notifyPartialParams.shouldEmail || notifyPartialParams.shouldEmail === "true") {
             if (notifyPartialParams.documentType === DocumentTypes.TFL_FEED) {
               const emailList = notifyPartialParams.email.split(",");
-              emailList.forEach((email) => {
+              await emailList.forEach((email) => {
                 notifyPartialParams.email = email;
                 notifyPromises.push(notifyService.sendNotification(notifyPartialParams));
               });
@@ -57,6 +57,8 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
       });
     }
   });
+
+  console.log(notifyPromises);
 
   return Promise.all(notifyPromises).catch((error: any) => {
     console.error(error);
