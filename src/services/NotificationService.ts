@@ -23,7 +23,7 @@ class NotificationService {
     const emailDetails = {
       personalisation: {
         ...notifyPartialParams.personalisation,
-        link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.fileData, { confirmEmailBeforeDownload: false, isCSV: notifyPartialParams.personalisation.documentType === DocumentTypes.TFL_FEED ? true : false }),
+        link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.fileData, { confirmEmailBeforeDownload: false, isCSV: notifyPartialParams.documentType === DocumentTypes.TFL_FEED ? true : false }),
       },
     };
     const templateId = await this.config.getTemplateIdFromEV(notifyPartialParams.documentType);
