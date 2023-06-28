@@ -38,7 +38,7 @@ describe("NotificationService", () => {
       };
       const resp = await notificationService.sendNotification(params);
       expect(resp).toEqual("it worked");
-      expect(prepareUploadFake.args[0]).toEqual([params.fileData, { confirmEmailBeforeDownload: false }]);
+      expect(prepareUploadFake.args[0]).toEqual([params.fileData, { confirmEmailBeforeDownload: false, isCSV: false }]);
     });
     it("should bubble up error if notify client prepareUpload method throws error", async () => {
       const prepareUploadFake = sinon.fake.throws("preparer: Oh No!");
