@@ -103,9 +103,7 @@ class CertificateDownloadService {
       shouldEmail: "true",
       fileData: result.Body,
       documentType: DocumentTypes.TFL_FEED,
-      personalisation: {
-        file_format: "csv",
-      },
+      personalisation: {},
     };
   }
 
