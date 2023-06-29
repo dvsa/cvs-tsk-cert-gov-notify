@@ -20,8 +20,6 @@ class NotificationService {
    * @param params - personalization details,email and certificate
    */
   public async sendNotification(notifyPartialParams: IPartialParams) {
-    console.log(notifyPartialParams);
-    console.log(notifyPartialParams.documentType === DocumentTypes.TFL_FEED ? true : false);
     const emailDetails = {
       personalisation: {
         ...notifyPartialParams.personalisation,
@@ -29,9 +27,6 @@ class NotificationService {
       },
     };
     const templateId = await this.config.getTemplateIdFromEV(notifyPartialParams.documentType);
-
-    console.log("email:", notifyPartialParams.email);
-    console.log("details:", emailDetails);
 
     console.log(`Sent email using ${templateId} templateId, ${notifyPartialParams.documentType} with ${notifyPartialParams.personalisation.date_of_issue} date of issue`);
     console.log(`Personalisation params: ${JSON.stringify(notifyPartialParams.personalisation)} + email ${notifyPartialParams.email}`);
