@@ -1,6 +1,6 @@
 // @ts-ignore
 import { NotifyClient } from "notifications-node-client";
-import { IPartialParams } from "../models";
+import { DocumentTypes, IPartialParams } from "../models";
 import { Configuration } from "../utils/Configuration";
 
 /**
@@ -23,7 +23,7 @@ class NotificationService {
     const emailDetails = {
       personalisation: {
         ...notifyPartialParams.personalisation,
-        link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.fileData, { confirmEmailBeforeDownload: false }),
+        link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.fileData, { confirmEmailBeforeDownload: false, isCsv: notifyPartialParams.documentType === DocumentTypes.TFL_FEED ? true : false }),
       },
     };
     const templateId = await this.config.getTemplateIdFromEV(notifyPartialParams.documentType);
