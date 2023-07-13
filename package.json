@@ -33,7 +33,7 @@
     "aws-xray-sdk": "^3.3.4",
     "js-yaml": "^3.13.1",
     "node-yaml": "^4.0.1",
-    "notifications-node-client": "^6.0.0",
+    "notifications-node-client": "^7.0.1",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
