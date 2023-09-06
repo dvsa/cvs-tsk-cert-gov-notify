@@ -4,8 +4,8 @@
   "description": "Certificate generation initiation task",
   "main": "handler.js",
   "engines": {
-    "node": "14.*",
-    "npm": "5.6.0"
+    "node": "18.*",
+    "npm": "8.*"
   },
   "scripts": {
     "start": "BRANCH=local BUCKET=local serverless invoke local -f main --path tests/resources/s3-event.json",
