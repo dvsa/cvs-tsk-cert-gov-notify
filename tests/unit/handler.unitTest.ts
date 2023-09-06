@@ -1,12 +1,10 @@
-import * as notify from "../../src/functions/govNotify";
 import { config as AWSConfig } from "aws-sdk";
-import mockContext from "aws-lambda-mock-context";
+import * as notify from "../../src/functions/govNotify";
 import { Configuration } from "../../src/utils/Configuration";
 
 describe("handler", () => {
   // @ts-ignore
   (Configuration as any).instance = new Configuration("../../src/config/config.yml", "../../tests/resources/mockSecrets.yml");
-  const ctx = mockContext();
   const myMock = jest.fn().mockResolvedValue("Success");
   // @ts-ignore
   notify.govNotify = myMock;
