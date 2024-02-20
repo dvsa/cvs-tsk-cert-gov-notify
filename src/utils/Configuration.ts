@@ -1,9 +1,9 @@
-// @ts-ignore
-import * as yml from "node-yaml";
-import { DocumentTypes, IConfig, IInvokeConfig, INotifyConfig, IS3Config } from "../models";
-import { ERRORS } from "../assets/enum";
 import SecretsManager, { GetSecretValueRequest, GetSecretValueResponse } from "aws-sdk/clients/secretsmanager";
 import { safeLoad } from "js-yaml";
+// @ts-ignore
+import * as yml from "node-yaml";
+import { ERRORS } from "../assets/enum";
+import { DocumentTypes, IConfig, IInvokeConfig, INotifyConfig, IS3Config } from "../models";
 /* tslint:disable */
 const AWSXRay = require("aws-xray-sdk");
 
@@ -109,6 +109,8 @@ class Configuration {
       switch (templateType) {
         case DocumentTypes.CERTIFICATE:
           return process.env.CERTIFICATE_TEMPLATE_ID!;
+        case DocumentTypes.ADR_CERTIFICATE:
+          return process.env.ADR_CERTIFICATE_TEMPLATE_ID!;
         case DocumentTypes.MINISTRY_PLATE:
           return process.env.PLATE_TEMPLATE_ID!;
         case DocumentTypes.TRAILER_INTO_SERVICE:

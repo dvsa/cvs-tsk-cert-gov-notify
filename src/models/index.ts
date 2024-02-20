@@ -45,6 +45,8 @@ enum DocumentTypes {
   MINISTRY_PLATE = "VTG6_VTG7",
   TRAILER_INTO_SERVICE = "TrailerIntoService",
   TFL_FEED = "TFL_FEED",
+  ADR_CERTIFICATE = "ADR_CERTIFICATE",
 }
 
-export { IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig, IConfig, IPartialParams, DocumentTypes };
+export { DocumentTypes, IConfig, IInvokeConfig, INotifyConfig, IPartialParams, IS3Config, ISecretConfig };
+

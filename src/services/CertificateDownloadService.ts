@@ -1,7 +1,7 @@
-import { Configuration } from "../utils/Configuration";
-import { S3BucketService } from "./S3BucketService";
 import S3 from "aws-sdk/clients/s3";
 import { DocumentTypes, IPartialParams } from "../models";
+import { Configuration } from "../utils/Configuration";
+import { S3BucketService } from "./S3BucketService";
 
 /**
  * Service class for Certificate Generation
@@ -41,23 +41,46 @@ class CertificateDownloadService {
    * @returns set of notify params needed
    */
   public generateCertificatePartialParams(result: S3.Types.GetObjectOutput): IPartialParams {
-    return {
-      personalisation: {
-        vrms: result.Metadata!.vrm,
-        test_type_name: result.Metadata!["test-type-name"],
-        date_of_issue: result.Metadata!["date-of-issue"],
-        cert_index: result.Metadata!["cert-index"],
-        total_certs: result.Metadata!["total-certs"],
-        test_type_result: result.Metadata!["test-type-result"],
-        cert_type: result.Metadata!["cert-type"],
-        file_format: result.Metadata!["file-format"],
-        file_size: result.Metadata!["file-size"],
-      },
-      email: result.Metadata!.email,
-      shouldEmail: result.Metadata!["should-email-certificate"],
-      fileData: result.Body,
-      documentType: DocumentTypes.CERTIFICATE,
-    };
+    switch (result.Metadata!['cert-type']) {
+      // ADR certificates
+      case "ADR01C":
+        return {
+          personalisation: {
+            vrms: result.Metadata!.vrm,
+            test_type_name: result.Metadata!["test-type-name"],
+            date_of_issue: result.Metadata!["date-of-issue"],
+            cert_index: result.Metadata!["cert-index"],
+            total_certs: result.Metadata!["total-certs"],
+            test_type_result: result.Metadata!["test-type-result"],
+            cert_type: result.Metadata!["cert-type"],
+            file_format: result.Metadata!["file-format"],
+            file_size: result.Metadata!["file-size"],
+          },
+          email: result.Metadata!.email,
+          shouldEmail: result.Metadata!["should-email-certificate"],
+          fileData: result.Body,
+          documentType: DocumentTypes.ADR_CERTIFICATE,
+        };
+      // Other cetificates (MOT)
+      default:
+        return {
+          personalisation: {
+            vrms: result.Metadata!.vrm,
+            test_type_name: result.Metadata!["test-type-name"],
+            date_of_issue: result.Metadata!["date-of-issue"],
+            cert_index: result.Metadata!["cert-index"],
+            total_certs: result.Metadata!["total-certs"],
+            test_type_result: result.Metadata!["test-type-result"],
+            cert_type: result.Metadata!["cert-type"],
+            file_format: result.Metadata!["file-format"],
+            file_size: result.Metadata!["file-size"],
+          },
+          email: result.Metadata!.email,
+          shouldEmail: result.Metadata!["should-email-certificate"],
+          fileData: result.Body,
+          documentType: DocumentTypes.CERTIFICATE,
+        };
+    }
   }
 
   /**
