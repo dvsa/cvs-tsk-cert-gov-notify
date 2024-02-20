@@ -23,7 +23,7 @@ describe("CertificateDownloadService", () => {
     files: ["1_1B7GG36N12S678410_1.base64"],
   });
   S3BucketMockService.setMetadata({
-    "vrm": "BQ91YHQ",
+    vrm: "BQ91YHQ",
     "test-type-name": "Annual test",
     "date-of-issue": "11 March 2019",
     "total-certs": "2",
@@ -33,7 +33,7 @@ describe("CertificateDownloadService", () => {
     "file-format": "pdf",
     "file-size": "306784",
     "should-email-certificate": "true",
-    "email": "testemail@testdomain.com",
+    email: "testemail@testdomain.com",
   });
 
   context("getCertificate()", () => {
@@ -116,9 +116,9 @@ describe("CertificateDownloadService", () => {
       const result: S3.Types.GetObjectOutput = {
         Metadata: {
           "document-type": "VTG6_VTG7",
-          "vrm": "12345",
+          vrm: "12345",
           "date-of-issue": "12345",
-          "email": "test@test.com",
+          email: "test@test.com",
           "should-email-certificate": "true",
         },
         Body: "1234",
@@ -144,7 +144,7 @@ describe("CertificateDownloadService", () => {
         Metadata: {
           "document-type": "TrailerIntoService",
           "date-of-issue": "12345",
-          "email": "test@test.com",
+          email: "test@test.com",
           "should-email-certificate": "true",
           "trailer-id": "12345",
         },

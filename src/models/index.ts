@@ -49,4 +49,3 @@ enum DocumentTypes {
 }
 
 export { DocumentTypes, IConfig, IInvokeConfig, INotifyConfig, IPartialParams, IS3Config, ISecretConfig };
-

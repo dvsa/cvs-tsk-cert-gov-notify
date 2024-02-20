@@ -41,7 +41,7 @@ class CertificateDownloadService {
    * @returns set of notify params needed
    */
   public generateCertificatePartialParams(result: S3.Types.GetObjectOutput): IPartialParams {
-    switch (result.Metadata!['cert-type']) {
+    switch (result.Metadata!["cert-type"]) {
       // ADR certificates
       case "ADR01C":
         return {
