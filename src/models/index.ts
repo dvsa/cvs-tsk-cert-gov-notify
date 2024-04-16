@@ -1,3 +1,5 @@
+import { __MetadataBearer, GetObjectCommandOutput, GetObjectOutput } from '@aws-sdk/client-s3';
+
 interface IInvokeConfig {
   params: { apiVersion: string; endpoint?: string };
   functions: { testResults: { name: string }; techRecords: { name: string; mock: string } };
@@ -36,8 +38,12 @@ interface IPartialParams {
   personalisation: any;
   email: string;
   shouldEmail: string;
-  fileData?: AWS.S3.Body;
+  fileData?: Buffer;
   documentType: DocumentTypes;
+}
+
+interface IGetObjectCommandOutput extends Omit<GetObjectOutput, "Body">, __MetadataBearer {
+  Body: Buffer;
 }
 
 enum DocumentTypes {
@@ -47,4 +53,4 @@ enum DocumentTypes {
   TFL_FEED = "TFL_FEED",
 }
 
-export { IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig, IConfig, IPartialParams, DocumentTypes };
+export { IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig, IConfig, IPartialParams, DocumentTypes, IGetObjectCommandOutput };

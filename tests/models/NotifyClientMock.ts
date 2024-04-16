@@ -6,7 +6,6 @@ class NotifyClientMock {
   public static prepareUploadResponseFile: Buffer;
   public static sendEmailResponse: any;
 
-  // tslint:disable-next-line:no-empty
   constructor(apiKey: any) {}
 
   /**

@@ -1,11 +1,9 @@
 import { Configuration } from "../../src/utils/Configuration";
 import { DocumentTypes, IS3Config } from "../../src/models";
-import { safeDump } from "js-yaml";
+import { mockClient } from "aws-sdk-client-mock";
+import { dump } from "js-yaml";
 import * as fs from "fs";
-import * as AWSMock from "aws-sdk-mock";
-import { fake, SinonSpy } from "sinon";
-import { GetSecretValueResponse } from "aws-sdk/clients/secretsmanager";
-import AWS = require("aws-sdk");
+import { GetSecretValueCommand, GetSecretValueResponse, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
 import { ERRORS } from "../../src/assets/enum";
 
 describe("Configuration", () => {
@@ -67,7 +65,6 @@ describe("Configuration", () => {
     process.env.BRANCH = "test";
     const s3config: IS3Config = config.getS3Config();
     it("should return the local S3 config", () => {
-      // tslint:disable-next-line:no-unused-expression
       expect(s3config).toStrictEqual({});
     });
   });
@@ -81,7 +78,7 @@ describe("Configuration", () => {
       await expect(config.getNotifyConfig()).rejects.toThrowError();
     });
     it("should succeed if secrets.yml exists", async () => {
-      await fs.writeFileSync("src/config/secrets.yml", safeDump({ notify: { api_key: "asddfg" } }));
+      await fs.writeFileSync("src/config/secrets.yml", dump({ notify: { api_key: "asddfg" } }));
       const notify = await config.getNotifyConfig();
       expect(notify.api_key).toBe("asddfg");
       await fs.unlinkSync("src/config/secrets.yml");
@@ -93,21 +90,22 @@ describe("Configuration", () => {
     it("should return a correct MOT config", async () => {
       const fakeResp: GetSecretValueResponse = {
         SecretString: `notify:
-  endpoint: asdfg
-  apiKey: asfg`,
+    endpoint: asdfg
+    apiKey: asfg`,
       };
-      const spy: SinonSpy = fake.resolves(fakeResp);
-      AWSMock.setSDKInstance(AWS);
-      AWSMock.mock("SecretsManager", "getSecretValue", spy);
+      const mock = mockClient(SecretsManagerClient);
+      mock.on(GetSecretValueCommand).resolves(fakeResp);
+
       const notify = await Configuration.getInstance().getNotifyConfig();
+
       expect(notify.api_key.length).toBeGreaterThanOrEqual(1);
-      AWSMock.restore("SecretsManager");
+
+      mock.restore();
     });
   });
   context("When calling getTemplateIdFromEv and the branch is local", () => {
     it("should not throw an error when templateId does exist", async () => {
       await config.getTemplateIdFromEV("certificate" as unknown as DocumentTypes).then((x) => {
-        console.log(x);
         expect(x).toEqual("ff36dae2-937e-4883-9e25-e776fa6af665");
       });
     });

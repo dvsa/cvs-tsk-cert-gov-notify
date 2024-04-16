@@ -2,10 +2,9 @@
 import * as yml from "node-yaml";
 import { DocumentTypes, IConfig, IInvokeConfig, INotifyConfig, IS3Config } from "../models";
 import { ERRORS } from "../assets/enum";
-import SecretsManager, { GetSecretValueRequest, GetSecretValueResponse } from "aws-sdk/clients/secretsmanager";
-import { safeLoad } from "js-yaml";
-/* tslint:disable */
-const AWSXRay = require("aws-xray-sdk");
+import { GetSecretValueCommandInput, GetSecretValueCommandOutput, SecretsManager } from "@aws-sdk/client-secrets-manager";
+import { load } from "js-yaml";
+import AWSXRay from "aws-xray-sdk";
 
 /**
  * Configuration class for retrieving project config
@@ -17,7 +16,11 @@ class Configuration {
   private secretsClient: SecretsManager;
 
   constructor(configPath: string, secretsPath: string) {
-    this.secretsClient = AWSXRay.captureAWSClient(new SecretsManager({ region: "eu-west-1" }));
+    this.secretsClient = AWSXRay.captureAWSv3Client(
+      new SecretsManager({
+        region: "eu-west-1",
+      }),
+    );
     this.secretPath = secretsPath;
     const config = yml.readSync(configPath);
 
@@ -129,12 +132,12 @@ class Configuration {
     let secretConfig;
 
     if (process.env.SECRET_NAME) {
-      const req: GetSecretValueRequest = {
+      const secretRequest: GetSecretValueCommandInput = {
         SecretId: process.env.SECRET_NAME,
       };
-      const resp: GetSecretValueResponse = await this.secretsClient.getSecretValue(req).promise();
+      const resp: GetSecretValueCommandOutput = await this.secretsClient.getSecretValue(secretRequest);
       try {
-        secretConfig = safeLoad(resp.SecretString as string);
+        secretConfig = load(resp.SecretString as string);
       } catch (e) {
         throw new Error("SecretString is empty.");
       }

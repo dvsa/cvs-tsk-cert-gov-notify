@@ -2,6 +2,8 @@ import { NotificationService } from "../../src/services/NotificationService";
 import { Configuration } from "../../src/utils/Configuration";
 import sinon from "sinon";
 import { DocumentTypes, IPartialParams } from "../../src/models";
+import { Readable } from "stream";
+import { StreamingBlobPayloadOutputTypes } from "@smithy/types";
 
 describe("NotificationService", () => {
   const sandbox = sinon.createSandbox();
@@ -32,7 +34,7 @@ describe("NotificationService", () => {
           file_size: "306784",
         },
         email: "testemail@testdomain.com",
-        fileData: "certData",
+        fileData: "certData" as any,
         shouldEmail: "true",
         documentType: "certificate" as unknown as DocumentTypes,
       };
@@ -46,7 +48,7 @@ describe("NotificationService", () => {
       const notifyClientMock = { prepareUpload: prepareUploadFake, sendEmail: null };
       const notificationService: NotificationService = new NotificationService(notifyClientMock);
 
-      const params = {
+      const params: IPartialParams = {
         personalisation: {
           vrms: "BQ91YHQ",
           test_type_name: "Annual test",
@@ -58,7 +60,7 @@ describe("NotificationService", () => {
           file_size: "306784",
         },
         email: "testemail@testdomain.com",
-        fileData: "certData",
+        fileData: "certData" as any,
         shouldEmail: "true",
         documentType: "certificate" as unknown as DocumentTypes,
       };
@@ -67,6 +69,7 @@ describe("NotificationService", () => {
       try {
         await notificationService.sendNotification(params);
       } catch (e) {
+        // @ts-ignore
         expect(e.message).toEqual("preparer: Oh No!");
       }
     });
@@ -76,7 +79,7 @@ describe("NotificationService", () => {
       const notifyClientMock = { prepareUpload: prepareUploadFake, sendEmail: sendEmailFake };
       const notificationService: NotificationService = new NotificationService(notifyClientMock);
 
-      const params = {
+      const params: IPartialParams = {
         personalisation: {
           vrms: "BQ91YHQ",
           test_type_name: "Annual test",
@@ -88,7 +91,7 @@ describe("NotificationService", () => {
           file_size: "306784",
         },
         email: "testemai@testdomain.com",
-        fileData: "certData",
+        fileData: "certData" as any,
         shouldEmail: "true",
         documentType: "certificate" as unknown as DocumentTypes,
       };
@@ -97,6 +100,7 @@ describe("NotificationService", () => {
       try {
         await notificationService.sendNotification(params);
       } catch (e) {
+        // @ts-ignore
         expect(e.message).toEqual("sender: Oh No!");
       }
     });

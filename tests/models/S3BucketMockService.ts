@@ -1,8 +1,5 @@
-import S3, { Metadata } from "aws-sdk/clients/s3";
-import { AWSError, Response } from "aws-sdk";
+import { GetObjectCommandOutput, GetObjectOutput, PutObjectCommandOutput } from "@aws-sdk/client-s3";
 import { Readable } from "stream";
-import { PromiseResult } from "aws-sdk/lib/request";
-import { ManagedUpload } from "aws-sdk/lib/s3/managed_upload";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -27,7 +24,7 @@ class S3BucketMockService {
    * @param content - contents of the file
    * @param metadata - optional metadata
    */
-  public async upload(bucketName: string, fileName: string, content: Buffer | Uint8Array | Blob | string | Readable, metadata?: Metadata): Promise<ManagedUpload.SendData> {
+  public async upload(bucketName: string, fileName: string, content: Buffer | Uint8Array | Blob | string | Readable, metadata?: Record<string, string>): Promise<PutObjectCommandOutput> {
     const bucket: IBucket | undefined = S3BucketMockService.buckets.find((currentBucket: IBucket) => {
       return currentBucket.bucketName === bucketName;
     });
@@ -61,7 +58,7 @@ class S3BucketMockService {
       throw error;
     }
 
-    const response: ManagedUpload.SendData = {
+    const response: any = {
       Location: `http://localhost:7000/${bucketName}/${fileName}`,
       ETag: "621c9c14d75958d4c3ed8ad77c80cde1",
       Bucket: bucketName,
@@ -76,7 +73,7 @@ class S3BucketMockService {
    * @param bucketName - the bucket from which to download
    * @param fileName - the name of the file
    */
-  public async download(bucketName: string, fileName: string): Promise<PromiseResult<S3.Types.GetObjectOutput, AWSError>> {
+  public async download(bucketName: string, fileName: string): Promise<GetObjectCommandOutput> {
     const bucket: IBucket | undefined = S3BucketMockService.buckets.find((currentBucket: IBucket) => {
       return currentBucket.bucketName === bucketName;
     });
@@ -109,22 +106,17 @@ class S3BucketMockService {
     }
 
     // @ts-ignore
-    const file: Buffer = fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/${bucketKey}`));
-    const data: S3.Types.GetObjectOutput = {
+    const file: any = fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/${bucketKey}`));
+    const data: GetObjectCommandOutput = {
       Body: file,
       ContentLength: file.length,
       ETag: "621c9c14d75958d4c3ed8ad77c80cde1",
       LastModified: new Date(),
       Metadata: S3BucketMockService.metadata,
+      $metadata: {}
     };
 
-    const response = new Response<S3.Types.GetObjectOutput, AWSError>();
-    Object.assign(response, { data });
-
-    return {
-      $response: response,
-      ...data,
-    };
+    return data;
   }
 }
 

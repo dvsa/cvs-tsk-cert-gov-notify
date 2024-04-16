@@ -1,7 +1,7 @@
 import { Configuration } from "../utils/Configuration";
 import { S3BucketService } from "./S3BucketService";
-import S3 from "aws-sdk/clients/s3";
-import { DocumentTypes, IPartialParams } from "../models";
+import { GetObjectCommandOutput } from "@aws-sdk/client-s3";
+import { DocumentTypes, IGetObjectCommandOutput, IPartialParams } from "../models";
 
 /**
  * Service class for Certificate Generation
@@ -19,15 +19,36 @@ class CertificateDownloadService {
    * Fetches the certificate with the given file name from the bucket.
    * @param fileName - the file name of the certificate you want to download
    */
-  public getCertificate(fileName: string) {
+  public async getCertificate(fileName: string) {
     const bucket = fileName.includes("VOSA") ? `cvs-enquiry-document-feed-${process.env.BRANCH}` : `cvs-cert-${process.env.BUCKET}`;
 
     return this.s3Client
       .download(bucket, fileName)
-      .then((result: S3.Types.GetObjectOutput) => {
+      .then(async (result: any) => {
         console.log(`Downloading result: ${JSON.stringify(this.cleanForLogging(result))}`);
+        let body: Buffer[] = [];
 
-        return fileName.includes("VOSA") ? this.generateTFLFeedParams(result) : result.Metadata!["cert-type"] ? this.generateCertificatePartialParams(result) : this.generatePartialParams(result);
+        const endEventPromise = new Promise<Buffer>((resolve) => {
+          result.Body.on('end', () => {
+            const buffer = Buffer.concat(body);
+            console.log('Buffer ~:', buffer);
+            resolve(buffer);
+          });
+        });
+
+        await new Promise((resolve, reject) => {
+          result.Body.on('data', (chunk: Buffer) => {
+            body.push(chunk);
+          }).on('error', reject);
+        });
+
+        const buffer = await endEventPromise;
+
+        const updatedResult: IGetObjectCommandOutput = { ...result, Body: buffer }
+
+        console.log('result ~:', updatedResult)
+
+        return fileName.includes("VOSA") ? this.generateTFLFeedParams(updatedResult) : updatedResult.Metadata!["cert-type"] ? this.generateCertificatePartialParams(updatedResult) : this.generatePartialParams(updatedResult);
       })
       .catch((error) => {
         console.error(error);
@@ -40,7 +61,7 @@ class CertificateDownloadService {
    * @param result
    * @returns set of notify params needed
    */
-  public generateCertificatePartialParams(result: S3.Types.GetObjectOutput): IPartialParams {
+  public generateCertificatePartialParams(result: IGetObjectCommandOutput): IPartialParams {
     return {
       personalisation: {
         vrms: result.Metadata!.vrm,
@@ -65,7 +86,7 @@ class CertificateDownloadService {
    * @param result
    * @returns set of notify params needed
    */
-  public generatePartialParams(result: S3.Types.GetObjectOutput): IPartialParams {
+  public generatePartialParams(result: IGetObjectCommandOutput): IPartialParams {
     let personalisation;
     const documentType: DocumentTypes = result.Metadata!["document-type"] as DocumentTypes;
 
@@ -81,7 +102,7 @@ class CertificateDownloadService {
       };
     }
 
-    const partialParams = {
+    const partialParams: IPartialParams = {
       email: result.Metadata!.email,
       shouldEmail: result.Metadata!["should-email-certificate"],
       fileData: result.Body,
@@ -97,7 +118,7 @@ class CertificateDownloadService {
    * @param result
    * @returns set of notify params needed
    */
-  public generateTFLFeedParams(result: S3.Types.GetObjectOutput): IPartialParams {
+  public generateTFLFeedParams(result: IGetObjectCommandOutput): IPartialParams {
     return {
       email: "",
       shouldEmail: "true",

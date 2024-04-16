@@ -1,24 +1,18 @@
-import S3 from "aws-sdk/clients/s3";
-import { AWSError, config as AWSConfig } from "aws-sdk";
+import { GetObjectCommand, GetObjectCommandOutput, S3Client } from "@aws-sdk/client-s3";
 import { Configuration } from "../utils/Configuration";
 import { IS3Config } from "../models";
-import { PromiseResult } from "aws-sdk/lib/request";
-/* tslint:disable */
-const AWSXRay = require("aws-xray-sdk");
-
-/* tslint:enable */
+import { ServiceException } from "@smithy/smithy-client";
+import AWSXRay from "aws-xray-sdk";
 
 /**
  * Service class for communicating with Simple Storage Service
  */
 class S3BucketService {
-  public readonly s3Client: S3;
+  public readonly s3Client: S3Client;
 
-  constructor(s3Client: S3) {
+  constructor(s3Client: S3Client) {
     const config: IS3Config = Configuration.getInstance().getS3Config();
-    this.s3Client = AWSXRay.captureAWSClient(s3Client);
-
-    AWSConfig.s3 = config;
+    this.s3Client = AWSXRay.captureAWSv3Client(new S3Client({ ...s3Client, ...config }));
   }
 
   /**
@@ -26,14 +20,19 @@ class S3BucketService {
    * @param bucketName - the bucket from which to download
    * @param fileName - the name of the file
    */
-  public download(bucketName: string, fileName: string): Promise<PromiseResult<S3.Types.GetObjectOutput, AWSError>> {
+  public async download(bucketName: string, fileName: string): Promise<GetObjectCommandOutput | ServiceException> {
     console.log(`Downloading file: bucket name: ${bucketName}, key: ${process.env.BRANCH}/${fileName}`);
-    return this.s3Client
-      .getObject({
-        Bucket: bucketName,
-        Key: `${fileName}`,
-      })
-      .promise();
+    const command = new GetObjectCommand({
+      Bucket: bucketName,
+      Key: `${process.env.BRANCH}/${fileName}`,
+    });
+
+    try {
+      const response = await this.s3Client.send(command);
+      return response
+    } catch (err) {
+      throw err;
+    }
   }
 }
 
