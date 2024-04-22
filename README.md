@@ -166,7 +166,7 @@ Please familiarise yourself with [commitlint](https://commitlint.js.org/#/) and 
 
 ### Hooks and code standards
 
-The projects has multiple hooks configured using [husky](https://github.com/typicode/husky#readme) which will execute the following scripts: `security-checks`, `audit`, `prepush`.
+The projects has multiple hooks configured using [husky](https://github.com/typicode/husky#readme) which will execute the following scripts: `security-checks`, `audit`, `eslint`, `prepush`.
 The codebase uses [typescript clean code standards](https://github.com/labs42io/clean-code-typescript) as well as sonarqube for static analysis.
 
 SonarQube is available locally, please follow the instructions below if you wish to run the service locally (brew is the preferred approach).

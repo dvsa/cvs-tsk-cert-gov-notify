@@ -1,8 +1,8 @@
-import { GetObjectCommand, GetObjectCommandOutput, S3Client } from "@aws-sdk/client-s3";
-import { Configuration } from "../utils/Configuration";
-import { IS3Config } from "../models";
-import { ServiceException } from "@smithy/smithy-client";
-import AWSXRay from "aws-xray-sdk";
+import { GetObjectCommand, GetObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
+import { ServiceException } from '@smithy/smithy-client';
+import AWSXRay from 'aws-xray-sdk';
+import { Configuration } from '../utils/Configuration';
+import { IS3Config } from '../models';
 
 /**
  * Service class for communicating with Simple Storage Service
@@ -27,12 +27,8 @@ class S3BucketService {
       Key: `${process.env.BRANCH}/${fileName}`,
     });
 
-    try {
-      const response = await this.s3Client.send(command);
-      return response
-    } catch (err) {
-      throw err;
-    }
+    const response = await this.s3Client.send(command);
+    return response;
   }
 }
 

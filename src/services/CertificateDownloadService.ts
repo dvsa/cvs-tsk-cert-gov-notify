@@ -1,13 +1,14 @@
-import { Configuration } from "../utils/Configuration";
-import { S3BucketService } from "./S3BucketService";
-import { GetObjectCommandOutput } from "@aws-sdk/client-s3";
-import { DocumentTypes, IGetObjectCommandOutput, IPartialParams } from "../models";
+/* eslint-disable class-methods-use-this */
+import { Configuration } from '../utils/Configuration';
+import { S3BucketService } from './S3BucketService';
+import { DocumentTypes, IGetObjectCommandOutput, IPartialParams } from '../models';
 
 /**
  * Service class for Certificate Generation
  */
 class CertificateDownloadService {
   private readonly s3Client: S3BucketService;
+
   private readonly config: Configuration;
 
   constructor(s3Client: S3BucketService) {
@@ -20,13 +21,13 @@ class CertificateDownloadService {
    * @param fileName - the file name of the certificate you want to download
    */
   public async getCertificate(fileName: string) {
-    const bucket = fileName.includes("VOSA") ? `cvs-enquiry-document-feed-${process.env.BRANCH}` : `cvs-cert-${process.env.BUCKET}`;
+    const bucket = fileName.includes('VOSA') ? `cvs-enquiry-document-feed-${process.env.BRANCH}` : `cvs-cert-${process.env.BUCKET}`;
 
     return this.s3Client
       .download(bucket, fileName)
       .then(async (result: any) => {
         console.log(`Downloading result: ${JSON.stringify(this.cleanForLogging(result))}`);
-        let body: Buffer[] = [];
+        const body: Buffer[] = [];
 
         const endEventPromise = new Promise<Buffer>((resolve) => {
           result.Body.on('end', () => {
@@ -44,11 +45,12 @@ class CertificateDownloadService {
 
         const buffer = await endEventPromise;
 
-        const updatedResult: IGetObjectCommandOutput = { ...result, Body: buffer }
+        const updatedResult: IGetObjectCommandOutput = { ...result, Body: buffer };
 
-        console.log('result ~:', updatedResult)
+        console.log('result ~:', updatedResult);
 
-        return fileName.includes("VOSA") ? this.generateTFLFeedParams(updatedResult) : updatedResult.Metadata!["cert-type"] ? this.generateCertificatePartialParams(updatedResult) : this.generatePartialParams(updatedResult);
+        // eslint-disable-next-line no-nested-ternary
+        return fileName.includes('VOSA') ? this.generateTFLFeedParams(updatedResult) : updatedResult.Metadata!['cert-type'] ? this.generateCertificatePartialParams(updatedResult) : this.generatePartialParams(updatedResult);
       })
       .catch((error) => {
         console.error(error);
@@ -65,17 +67,17 @@ class CertificateDownloadService {
     return {
       personalisation: {
         vrms: result.Metadata!.vrm,
-        test_type_name: result.Metadata!["test-type-name"],
-        date_of_issue: result.Metadata!["date-of-issue"],
-        cert_index: result.Metadata!["cert-index"],
-        total_certs: result.Metadata!["total-certs"],
-        test_type_result: result.Metadata!["test-type-result"],
-        cert_type: result.Metadata!["cert-type"],
-        file_format: result.Metadata!["file-format"],
-        file_size: result.Metadata!["file-size"],
+        test_type_name: result.Metadata!['test-type-name'],
+        date_of_issue: result.Metadata!['date-of-issue'],
+        cert_index: result.Metadata!['cert-index'],
+        total_certs: result.Metadata!['total-certs'],
+        test_type_result: result.Metadata!['test-type-result'],
+        cert_type: result.Metadata!['cert-type'],
+        file_format: result.Metadata!['file-format'],
+        file_size: result.Metadata!['file-size'],
       },
       email: result.Metadata!.email,
-      shouldEmail: result.Metadata!["should-email-certificate"],
+      shouldEmail: result.Metadata!['should-email-certificate'],
       fileData: result.Body,
       documentType: DocumentTypes.CERTIFICATE,
     };
@@ -88,23 +90,23 @@ class CertificateDownloadService {
    */
   public generatePartialParams(result: IGetObjectCommandOutput): IPartialParams {
     let personalisation;
-    const documentType: DocumentTypes = result.Metadata!["document-type"] as DocumentTypes;
+    const documentType: DocumentTypes = result.Metadata!['document-type'] as DocumentTypes;
 
     if (documentType === DocumentTypes.MINISTRY_PLATE) {
       personalisation = {
         vrms: result.Metadata!.vrm,
-        date_of_issue: result.Metadata!["date-of-issue"],
+        date_of_issue: result.Metadata!['date-of-issue'],
       };
     } else if (documentType === DocumentTypes.TRAILER_INTO_SERVICE) {
       personalisation = {
-        date_of_issue: result.Metadata!["date-of-issue"],
-        trailer_id: result.Metadata!["trailer-id"],
+        date_of_issue: result.Metadata!['date-of-issue'],
+        trailer_id: result.Metadata!['trailer-id'],
       };
     }
 
     const partialParams: IPartialParams = {
       email: result.Metadata!.email,
-      shouldEmail: result.Metadata!["should-email-certificate"],
+      shouldEmail: result.Metadata!['should-email-certificate'],
       fileData: result.Body,
       documentType,
       personalisation,
@@ -120,8 +122,8 @@ class CertificateDownloadService {
    */
   public generateTFLFeedParams(result: IGetObjectCommandOutput): IPartialParams {
     return {
-      email: "",
-      shouldEmail: "true",
+      email: '',
+      shouldEmail: 'true',
       fileData: result.Body,
       documentType: DocumentTypes.TFL_FEED,
       personalisation: {},

@@ -1,24 +1,27 @@
 // @ts-ignore
-import * as yml from "node-yaml";
-import { DocumentTypes, IConfig, IInvokeConfig, INotifyConfig, IS3Config } from "../models";
-import { ERRORS } from "../assets/enum";
-import { GetSecretValueCommandInput, GetSecretValueCommandOutput, SecretsManager } from "@aws-sdk/client-secrets-manager";
-import { load } from "js-yaml";
-import AWSXRay from "aws-xray-sdk";
+import * as yml from 'node-yaml';
+import { GetSecretValueCommandInput, GetSecretValueCommandOutput, SecretsManager } from '@aws-sdk/client-secrets-manager';
+import { load } from 'js-yaml';
+import AWSXRay from 'aws-xray-sdk';
+import { ERRORS } from '../assets/enum';
+import { DocumentTypes, IConfig, IInvokeConfig, INotifyConfig, IS3Config } from '../models';
 
 /**
  * Configuration class for retrieving project config
  */
 class Configuration {
   private static instance: Configuration;
+
   private readonly config: IConfig;
+
   private readonly secretPath: string;
+
   private secretsClient: SecretsManager;
 
   constructor(configPath: string, secretsPath: string) {
     this.secretsClient = AWSXRay.captureAWSv3Client(
       new SecretsManager({
-        region: "eu-west-1",
+        region: 'eu-west-1',
       }),
     );
     this.secretPath = secretsPath;
@@ -47,7 +50,7 @@ class Configuration {
    */
   public static getInstance(): Configuration {
     if (!this.instance) {
-      this.instance = new Configuration("../config/config.yml", "../config/secrets.yml");
+      this.instance = new Configuration('../config/config.yml', '../config/secrets.yml');
     }
 
     return Configuration.instance;
@@ -63,7 +66,7 @@ class Configuration {
     }
 
     // Not defining BRANCH will default to local
-    const env: string = !process.env.BRANCH || process.env.BRANCH === "local" ? "local" : "remote";
+    const env: string = !process.env.BRANCH || process.env.BRANCH === 'local' ? 'local' : 'remote';
 
     return this.config.invoke[env];
   }
@@ -78,7 +81,7 @@ class Configuration {
     }
 
     // Not defining BRANCH will default to local
-    const env: string = !process.env.BRANCH || process.env.BRANCH === "local" ? "local" : "remote";
+    const env: string = !process.env.BRANCH || process.env.BRANCH === 'local' ? 'local' : 'remote';
 
     return this.config.s3[env];
   }
@@ -101,8 +104,9 @@ class Configuration {
   /**
    * Retrieves the templateId from environment variable
    */
+  // eslint-disable-next-line @typescript-eslint/require-await
   public async getTemplateIdFromEV(templateType: DocumentTypes): Promise<string> {
-    if (!process.env.BRANCH || process.env.BRANCH === "local") {
+    if (!process.env.BRANCH || process.env.BRANCH === 'local') {
       if (!this.config.notify.templateId) {
         throw new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST);
       } else {
@@ -139,7 +143,7 @@ class Configuration {
       try {
         secretConfig = load(resp.SecretString as string);
       } catch (e) {
-        throw new Error("SecretString is empty.");
+        throw new Error('SecretString is empty.');
       }
     } else {
       console.warn(ERRORS.SECRET_ENV_VAR_NOT_EXIST);
@@ -152,7 +156,7 @@ class Configuration {
     try {
       this.config.notify.api_key = secretConfig.notify.api_key;
     } catch (e) {
-      throw new Error("secretConfig not set");
+      throw new Error('secretConfig not set');
     }
   }
 }

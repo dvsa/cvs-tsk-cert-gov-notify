@@ -1,4 +1,4 @@
-import { __MetadataBearer, GetObjectCommandOutput, GetObjectOutput } from '@aws-sdk/client-s3';
+import { __MetadataBearer, GetObjectOutput } from '@aws-sdk/client-s3';
 
 interface IInvokeConfig {
   params: { apiVersion: string; endpoint?: string };
@@ -42,15 +42,15 @@ interface IPartialParams {
   documentType: DocumentTypes;
 }
 
-interface IGetObjectCommandOutput extends Omit<GetObjectOutput, "Body">, __MetadataBearer {
+interface IGetObjectCommandOutput extends Omit<GetObjectOutput, 'Body'>, __MetadataBearer {
   Body: Buffer;
 }
 
 enum DocumentTypes {
-  CERTIFICATE = "certificate",
-  MINISTRY_PLATE = "VTG6_VTG7",
-  TRAILER_INTO_SERVICE = "TrailerIntoService",
-  TFL_FEED = "TFL_FEED",
+  CERTIFICATE = 'certificate',
+  MINISTRY_PLATE = 'VTG6_VTG7',
+  TRAILER_INTO_SERVICE = 'TrailerIntoService',
+  TFL_FEED = 'TFL_FEED',
 }
 
 export { IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig, IConfig, IPartialParams, DocumentTypes, IGetObjectCommandOutput };

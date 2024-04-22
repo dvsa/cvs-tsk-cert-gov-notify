@@ -18,6 +18,8 @@
     "test:unit": "AWS_XRAY_CONTEXT_MISSING=LOG_ERROR SECRET_NAME=cvs-tsk-cert-gov-notify/api-key BRANCH=local BUCKET=local jest --testMatch=\"**/*.unitTest.ts\" --runInBand",
     "test": "npm run test:unit -- --coverage",
     "test-i": "echo 'nothing to do'",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "prepush": "npm t && npm run build && npm run test-i",
     "sonar-scanner": "sonar-scanner",
@@ -47,7 +49,7 @@
     "@types/node": "^20.12.7",
     "@types/sinon": "^17.0.3",
     "aws-sdk-client-mock": "^4.0.0",
-    "eslint": "^9.0.0",
+    "eslint-config-wesbos": "^4.0.1",
     "husky": "^3.1.0",
     "jest": "^29.7.0",
     "jest-plugin-context": "^2.9.0",
@@ -71,7 +73,7 @@
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "npm run security-checks && npm run audit && npm run lint && npm run format",
+      "pre-commit": "npm run security-checks && npm run audit && npm run lint && npm run lint:fix",
       "pre-push": "npm run prepush"
     }
   }
