@@ -1,4 +1,6 @@
 /* eslint-disable class-methods-use-this */
+import { Stream } from 'stream';
+import { IncomingMessage } from 'http';
 import { Configuration } from '../utils/Configuration';
 import { S3BucketService } from './S3BucketService';
 import { DocumentTypes, IGetObjectCommandOutput, IPartialParams } from '../models';
@@ -23,39 +25,26 @@ class CertificateDownloadService {
   public async getCertificate(fileName: string) {
     const bucket = fileName.includes('VOSA') ? `cvs-enquiry-document-feed-${process.env.BRANCH}` : `cvs-cert-${process.env.BUCKET}`;
 
-    return this.s3Client
-      .download(bucket, fileName)
-      .then(async (result: any) => {
-        console.log(`Downloading result: ${JSON.stringify(this.cleanForLogging(result))}`);
-        const body: Buffer[] = [];
+    try {
+      const result: any = await this.s3Client.download(bucket, fileName);
 
-        const endEventPromise = new Promise<Buffer>((resolve) => {
-          result.Body.on('end', () => {
-            const buffer = Buffer.concat(body);
-            console.log('Buffer ~:', buffer);
-            resolve(buffer);
-          });
-        });
+      console.log(`Downloading result: ${JSON.stringify(this.cleanForLogging(result))}`);
 
-        await new Promise((resolve, reject) => {
-          result.Body.on('data', (chunk: Buffer) => {
-            body.push(chunk);
-          }).on('error', reject);
-        });
+      const chunks: Buffer[] = [];
+      // eslint-disable-next-line no-restricted-syntax
+      for await (const chunk of Stream.Readable.from(result.Body as IncomingMessage)) {
+        chunks.push(chunk as Buffer);
+      }
 
-        const buffer = await endEventPromise;
+      const buffer = Buffer.concat(chunks);
+      const updatedResult: IGetObjectCommandOutput = { ...result, Body: buffer };
 
-        const updatedResult: IGetObjectCommandOutput = { ...result, Body: buffer };
-
-        console.log('result ~:', updatedResult);
-
-        // eslint-disable-next-line no-nested-ternary
-        return fileName.includes('VOSA') ? this.generateTFLFeedParams(updatedResult) : updatedResult.Metadata!['cert-type'] ? this.generateCertificatePartialParams(updatedResult) : this.generatePartialParams(updatedResult);
-      })
-      .catch((error) => {
-        console.error(error);
-        throw error;
-      });
+      // eslint-disable-next-line no-nested-ternary
+      return fileName.includes('VOSA') ? this.generateTFLFeedParams(updatedResult) : updatedResult.Metadata!['cert-type'] ? this.generateCertificatePartialParams(updatedResult) : this.generatePartialParams(updatedResult);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   /**

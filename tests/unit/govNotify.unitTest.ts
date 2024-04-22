@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/unbound-method */
 import lambdaTester from 'lambda-tester';
 import { Configuration } from '../../src/utils/Configuration';
 import { CertificateDownloadService } from '../../src/services/CertificateDownloadService';
 import { NotificationService } from '../../src/services/NotificationService';
 import { DocumentTypes } from '../../src/models';
-import { govNotify } from '../../src/functions/govNotify';
+import { handler } from '../../src/handler';
 
 describe('gov-notify', () => {
   const event = {
@@ -56,7 +55,7 @@ describe('gov-notify', () => {
   });
   context('handler', () => {
     context('when the request is valid', () => {
-      it('response should resolve ', () => {
+      it('response should resolve', () => {
         CertificateDownloadService.prototype.getCertificate = jest.fn().mockResolvedValue('');
         NotificationService.prototype.sendNotification = jest.fn().mockResolvedValue({
           body: {
@@ -66,7 +65,7 @@ describe('gov-notify', () => {
             },
           },
         });
-        return lambdaTester(govNotify)
+        return lambdaTester(handler)
           .event(event)
           .expectResolve((result: any) => {
             delete result[0].body.content.body;
@@ -81,10 +80,10 @@ describe('gov-notify', () => {
         it('should call the sendNotification function and send', () => {
           CertificateDownloadService.prototype.getCertificate = jest.fn().mockResolvedValue({ shouldEmail: 'true' });
           NotificationService.prototype.sendNotification = jest.fn().mockResolvedValue('sent notification');
-          return lambdaTester(govNotify)
+          return lambdaTester(handler)
             .event(event)
             .expectResolve((result: any) => {
-              expect(result[0]).toEqual('sent notification');
+              expect(result[0]).toBe('sent notification');
               expect(NotificationService.prototype.sendNotification).toHaveBeenCalled();
             });
         });
@@ -95,10 +94,10 @@ describe('gov-notify', () => {
           process.env.TFL_EMAIL_LIST = 'email1@email.com,email2@email.com';
           CertificateDownloadService.prototype.getCertificate = jest.fn().mockResolvedValue({ email: 'email1@email.com,email2@email.com', shouldEmail: 'true', documentType: DocumentTypes.TFL_FEED });
           NotificationService.prototype.sendNotification = jest.fn().mockResolvedValue('sent notification');
-          return lambdaTester(govNotify)
+          return lambdaTester(handler)
             .event(eventTfl)
             .expectResolve((result: any) => {
-              expect(result[0]).toEqual('sent notification');
+              expect(result[0]).toBe('sent notification');
               expect(NotificationService.prototype.sendNotification).toHaveBeenCalled();
             });
         });
@@ -108,10 +107,10 @@ describe('gov-notify', () => {
         it('should call the sendNotification function', () => {
           CertificateDownloadService.prototype.getCertificate = jest.fn().mockResolvedValue({ shouldEmail: 'true' });
           NotificationService.prototype.sendNotification = jest.fn().mockResolvedValue('sent notification');
-          return lambdaTester(govNotify)
+          return lambdaTester(handler)
             .event(event)
             .expectResolve((result: any) => {
-              expect(result[0]).toEqual('sent notification');
+              expect(result[0]).toBe('sent notification');
               expect(NotificationService.prototype.sendNotification).toHaveBeenCalled();
             });
         });
@@ -121,10 +120,10 @@ describe('gov-notify', () => {
         it('should call the sendNotification function', () => {
           CertificateDownloadService.prototype.getCertificate = jest.fn().mockResolvedValue({ shouldEmail: 'false' });
           NotificationService.prototype.sendNotification = jest.fn().mockResolvedValue('sent notification');
-          return lambdaTester(govNotify)
+          return lambdaTester(handler)
             .event(event)
             .expectResolve((result: any) => {
-              expect(result[0]).toEqual(undefined);
+              expect(result[0]).toBeUndefined();
               expect(NotificationService.prototype.sendNotification).not.toHaveBeenCalled();
             });
         });
@@ -139,10 +138,10 @@ describe('gov-notify', () => {
           const eventBody = JSON.parse(event.Records[0].body);
           eventBody.Records[0].s3.object.key = s3KeyReceived;
           event.Records[0].body = JSON.stringify(eventBody);
-          return lambdaTester(govNotify)
+          return lambdaTester(handler)
             .event(event)
             .expectResolve((result: any) => {
-              expect(result[0]).toEqual('sent notification');
+              expect(result[0]).toBe('sent notification');
               expect(NotificationService.prototype.sendNotification).toHaveBeenCalled();
               expect(CertificateDownloadService.prototype.getCertificate).toHaveBeenCalledWith(expectedDecodedS3Key);
             });
@@ -156,10 +155,10 @@ describe('gov-notify', () => {
           const eventBody = JSON.parse(event.Records[0].body);
           eventBody.Records[0].s3.object.key = s3KeyReceived;
           event.Records[0].body = JSON.stringify(eventBody);
-          return lambdaTester(govNotify)
+          return lambdaTester(handler)
             .event(event)
             .expectResolve((result: any) => {
-              expect(result[0]).toEqual('sent notification');
+              expect(result[0]).toBe('sent notification');
               expect(NotificationService.prototype.sendNotification).toHaveBeenCalled();
               expect(CertificateDownloadService.prototype.getCertificate).toHaveBeenCalledWith(expectedDecodedS3Key);
             });
@@ -168,13 +167,12 @@ describe('gov-notify', () => {
     });
 
     context('when the request is not valid', () => {
-      it('response should reject ', () =>
-        lambdaTester(govNotify)
-          .event(undefined)
-          .expectReject((result: Error) => {
-            expect(result).toBeInstanceOf(Error);
-            expect(result.message).toEqual('Event is empty');
-          }));
+      it('response should reject', () => lambdaTester(handler)
+        .event(undefined)
+        .expectReject((result: Error) => {
+          expect(result).toBeInstanceOf(Error);
+          expect(result.message).toBe('Event is empty');
+        }));
     });
   });
 });

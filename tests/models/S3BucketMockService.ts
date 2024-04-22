@@ -1,3 +1,4 @@
+/* eslint-disable no-return-assign */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable class-methods-use-this */
@@ -99,6 +100,7 @@ class S3BucketMockService {
       throw error;
     }
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const file: any = fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/${bucketKey}`));
     const data: GetObjectCommandOutput = {
       Body: file,

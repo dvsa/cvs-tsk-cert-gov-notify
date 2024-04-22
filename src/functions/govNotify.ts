@@ -1,5 +1,8 @@
-// eslint-disable-next-line import/no-unresolved
-import { Callback, Context, Handler, S3Event, S3EventRecord, SQSEvent, SQSRecord } from 'aws-lambda';
+/* eslint-disable consistent-return */
+/* eslint-disable import/no-unresolved */
+import {
+  Callback, Context, Handler, S3Event, S3EventRecord, SQSEvent, SQSRecord,
+} from 'aws-lambda';
 import { PutObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
 // @ts-ignore
 import { NotifyClient } from 'notifications-node-client';
@@ -38,8 +41,6 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
         // Object key may have spaces or unicode non-ASCII characters.
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         const decodedS3Key = decodeURIComponent(s3Object.key.replace(/\+/g, ' '));
-
-        console.log('decodedS3Key', decodedS3Key);
 
         if (decodedS3Key.includes('VOSA')) {
           const emailList = process.env.TFL_EMAIL_LIST?.split(',');

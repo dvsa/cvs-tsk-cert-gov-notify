@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-conditional-expect */
 import sinon from 'sinon';
 import { NotificationService } from '../../src/services/NotificationService';
 import { Configuration } from '../../src/utils/Configuration';
@@ -36,7 +37,7 @@ describe('NotificationService', () => {
         documentType: 'certificate' as unknown as DocumentTypes,
       };
       const resp = await notificationService.sendNotification(params);
-      expect(resp).toEqual('it worked');
+      expect(resp).toBe('it worked');
       expect(prepareUploadFake.args[0]).toEqual([params.fileData, { confirmEmailBeforeDownload: false, isCsv: false }]);
     });
     it('should bubble up error if notify client prepareUpload method throws error', async () => {
@@ -67,7 +68,7 @@ describe('NotificationService', () => {
         await notificationService.sendNotification(params);
       } catch (e) {
         // @ts-ignore
-        expect(e.message).toEqual('preparer: Oh No!');
+        expect(e.message).toBe('preparer: Oh No!');
       }
     });
     it('should bubble up error if notify client sendEmail method throws error', async () => {
@@ -98,7 +99,7 @@ describe('NotificationService', () => {
         await notificationService.sendNotification(params);
       } catch (e) {
         // @ts-ignore
-        expect(e.message).toEqual('sender: Oh No!');
+        expect(e.message).toBe('sender: Oh No!');
       }
     });
   });

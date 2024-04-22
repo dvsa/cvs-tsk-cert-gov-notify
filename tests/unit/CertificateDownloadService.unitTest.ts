@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable jest/no-conditional-expect */
 import * as fs from 'fs';
 import * as path from 'path';
 import sinon from 'sinon';
@@ -37,28 +38,28 @@ describe('CertificateDownloadService', () => {
   });
 
   context('getCertificate()', () => {
-    // it("should return appropriate data", async () => {
-    //   const expectedResponse = {
-    //     personalisation: {
-    //       vrms: "BQ91YHQ",
-    //       test_type_name: "Annual test",
-    //       date_of_issue: "11 March 2019",
-    //       total_certs: "2",
-    //       test_type_result: "prs",
-    //       cert_type: "PSV_PRS",
-    //       cert_index: "1",
-    //       file_format: "pdf",
-    //       file_size: "306784",
-    //     },
-    //     email: "testemail@testdomain.com",
-    //     fileData: fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/1_1B7GG36N12S678410_1.base64`)),
-    //     shouldEmail: "true",
-    //     documentType: "certificate",
-    //   };
-    //   expect.assertions(1);
-    //   const response = await certificateDownloadService.getCertificate("1_1B7GG36N12S678410_1.base64");
-    //   expect(response).toEqual(expectedResponse);
-    // });
+    it('should return appropriate data', async () => {
+      const expectedResponse = {
+        personalisation: {
+          vrms: 'BQ91YHQ',
+          test_type_name: 'Annual test',
+          date_of_issue: '11 March 2019',
+          total_certs: '2',
+          test_type_result: 'prs',
+          cert_type: 'PSV_PRS',
+          cert_index: '1',
+          file_format: 'pdf',
+          file_size: '306784',
+        },
+        email: 'testemail@testdomain.com',
+        fileData: fs.readFileSync(path.resolve(__dirname, '../resources/certificates/base64/1_1B7GG36N12S678410_1.base64')),
+        shouldEmail: 'true',
+        documentType: 'certificate',
+      };
+      expect.assertions(1);
+      const response = await certificateDownloadService.getCertificate('1_1B7GG36N12S678410_1.base64');
+      expect(response).toEqual(expectedResponse);
+    });
     it('should bubble up error from S3 Client', async () => {
       // Remove bucket so download fails
       S3BucketMockService.buckets.pop();
@@ -67,7 +68,7 @@ describe('CertificateDownloadService', () => {
         await certificateDownloadService.getCertificate('1_1B7GG36N12S678410_1.base64');
       } catch (e) {
         // @ts-ignore
-        expect(e.message).toEqual('The specified bucket does not exist.');
+        expect(e.message).toBe('The specified bucket does not exist.');
       }
     });
   });

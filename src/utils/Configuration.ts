@@ -1,10 +1,13 @@
+/* eslint-disable security/detect-object-injection */
 // @ts-ignore
 import * as yml from 'node-yaml';
 import { GetSecretValueCommandInput, GetSecretValueCommandOutput, SecretsManager } from '@aws-sdk/client-secrets-manager';
 import { load } from 'js-yaml';
 import AWSXRay from 'aws-xray-sdk';
 import { ERRORS } from '../assets/enum';
-import { DocumentTypes, IConfig, IInvokeConfig, INotifyConfig, IS3Config } from '../models';
+import {
+  DocumentTypes, IConfig, IInvokeConfig, INotifyConfig, IS3Config,
+} from '../models';
 
 /**
  * Configuration class for retrieving project config
@@ -29,6 +32,7 @@ class Configuration {
 
     // Replace environment variable references
     let sConfig: string = JSON.stringify(config);
+    // eslint-disable-next-line security/detect-unsafe-regex
     const envRegex: RegExp = /\${(\w+\b):?(\w+\b)?}/g;
     const matches: RegExpMatchArray | null = sConfig.match(envRegex);
 

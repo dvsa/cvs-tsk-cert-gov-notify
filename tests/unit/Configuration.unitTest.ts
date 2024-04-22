@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-conditional-expect */
 import { mockClient } from 'aws-sdk-client-mock';
 import { dump } from 'js-yaml';
 import * as fs from 'fs';
@@ -73,7 +74,7 @@ describe('Configuration', () => {
       delete process.env.SECRET_NAME;
     });
     it('should fail if secrets.yml does not exist', async () => {
-      await expect(config.getNotifyConfig()).rejects.toThrowError();
+      await expect(config.getNotifyConfig()).rejects.toThrow();
     });
     it('should succeed if secrets.yml exists', async () => {
       fs.writeFileSync('src/config/secrets.yml', dump({ notify: { api_key: 'asddfg' } }));
@@ -104,7 +105,7 @@ describe('Configuration', () => {
   context('When calling getTemplateIdFromEv and the branch is local', () => {
     it('should not throw an error when templateId does exist', async () => {
       await config.getTemplateIdFromEV('certificate' as unknown as DocumentTypes).then((x) => {
-        expect(x).toEqual('ff36dae2-937e-4883-9e25-e776fa6af665');
+        expect(x).toBe('ff36dae2-937e-4883-9e25-e776fa6af665');
       });
     });
 
@@ -119,7 +120,7 @@ describe('Configuration', () => {
       process.env.BRANCH = 'remote';
       process.env.CERTIFICATE_TEMPLATE_ID = 'ff36dae2-937e-4883-9e25-e776fa6aaf665';
       await config.getTemplateIdFromEV('certificate' as unknown as DocumentTypes).then((x) => {
-        expect(x).toEqual('ff36dae2-937e-4883-9e25-e776fa6aaf665');
+        expect(x).toBe('ff36dae2-937e-4883-9e25-e776fa6aaf665');
       });
     });
   });
