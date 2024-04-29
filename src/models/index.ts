@@ -1,3 +1,5 @@
+import { __MetadataBearer, GetObjectOutput } from '@aws-sdk/client-s3';
+
 interface IInvokeConfig {
   params: { apiVersion: string; endpoint?: string };
   functions: { testResults: { name: string }; techRecords: { name: string; mock: string } };
@@ -36,15 +38,21 @@ interface IPartialParams {
   personalisation: any;
   email: string;
   shouldEmail: string;
-  fileData?: AWS.S3.Body;
+  fileData?: Buffer;
   documentType: DocumentTypes;
 }
 
-enum DocumentTypes {
-  CERTIFICATE = "certificate",
-  MINISTRY_PLATE = "VTG6_VTG7",
-  TRAILER_INTO_SERVICE = "TrailerIntoService",
-  TFL_FEED = "TFL_FEED",
+interface IGetObjectCommandOutput extends Omit<GetObjectOutput, 'Body'>, __MetadataBearer {
+  Body: Buffer;
 }
 
-export { IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig, IConfig, IPartialParams, DocumentTypes };
+enum DocumentTypes {
+  CERTIFICATE = 'certificate',
+  MINISTRY_PLATE = 'VTG6_VTG7',
+  TRAILER_INTO_SERVICE = 'TrailerIntoService',
+  TFL_FEED = 'TFL_FEED',
+}
+
+export {
+  IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig, IConfig, IPartialParams, DocumentTypes, IGetObjectCommandOutput,
+};

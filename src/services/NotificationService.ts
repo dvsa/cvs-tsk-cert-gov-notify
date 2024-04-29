@@ -1,13 +1,14 @@
 // @ts-ignore
-import { NotifyClient } from "notifications-node-client";
-import { DocumentTypes, IPartialParams } from "../models";
-import { Configuration } from "../utils/Configuration";
+import { NotifyClient } from 'notifications-node-client';
+import { DocumentTypes, IPartialParams } from '../models';
+import { Configuration } from '../utils/Configuration';
 
 /**
  * Service class for Certificate Notifications
  */
 class NotificationService {
   private readonly notifyClient: NotifyClient;
+
   private readonly config: Configuration;
 
   constructor(notifyClient: NotifyClient) {
@@ -23,7 +24,7 @@ class NotificationService {
     const emailDetails = {
       personalisation: {
         ...notifyPartialParams.personalisation,
-        link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.fileData, { confirmEmailBeforeDownload: false, isCsv: notifyPartialParams.documentType === DocumentTypes.TFL_FEED ? true : false }),
+        link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.fileData, { confirmEmailBeforeDownload: false, isCsv: notifyPartialParams.documentType === DocumentTypes.TFL_FEED }),
       },
     };
     const templateId = await this.config.getTemplateIdFromEV(notifyPartialParams.documentType);

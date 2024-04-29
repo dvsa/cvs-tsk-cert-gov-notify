@@ -1,10 +1,11 @@
-import S3, { Metadata } from "aws-sdk/clients/s3";
-import { AWSError, Response } from "aws-sdk";
-import { Readable } from "stream";
-import { PromiseResult } from "aws-sdk/lib/request";
-import { ManagedUpload } from "aws-sdk/lib/s3/managed_upload";
-import * as fs from "fs";
-import * as path from "path";
+/* eslint-disable no-return-assign */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable class-methods-use-this */
+import { GetObjectCommandOutput, PutObjectCommandOutput } from '@aws-sdk/client-s3';
+import { Readable } from 'stream';
+import * as fs from 'fs';
+import * as path from 'path';
 
 interface IBucket {
   bucketName: string;
@@ -16,6 +17,7 @@ interface IBucket {
  */
 class S3BucketMockService {
   public static buckets: IBucket[] = [];
+
   public static metadata: any;
 
   public static setMetadata = (metadata: any) => (S3BucketMockService.metadata = metadata);
@@ -27,16 +29,14 @@ class S3BucketMockService {
    * @param content - contents of the file
    * @param metadata - optional metadata
    */
-  public async upload(bucketName: string, fileName: string, content: Buffer | Uint8Array | Blob | string | Readable, metadata?: Metadata): Promise<ManagedUpload.SendData> {
-    const bucket: IBucket | undefined = S3BucketMockService.buckets.find((currentBucket: IBucket) => {
-      return currentBucket.bucketName === bucketName;
-    });
+  public async upload(bucketName: string, fileName: string, content: Buffer | Uint8Array | Blob | string | Readable, metadata?: Record<string, string>): Promise<PutObjectCommandOutput> {
+    const bucket: IBucket | undefined = S3BucketMockService.buckets.find((currentBucket: IBucket) => currentBucket.bucketName === bucketName);
 
     if (!bucket) {
       const error: Error = new Error();
       Object.assign(error, {
-        message: "The specified bucket does not exist.",
-        code: "NoSuchBucket",
+        message: 'The specified bucket does not exist.',
+        code: 'NoSuchBucket',
         statusCode: 404,
         retryable: false,
       });
@@ -44,16 +44,13 @@ class S3BucketMockService {
       throw error;
     }
 
-    // @ts-ignore
-    const bucketKey: string | undefined = bucket.files.find((currentFileName: string) => {
-      return currentFileName === fileName;
-    });
+    const bucketKey: string | undefined = bucket.files.find((currentFileName: string) => currentFileName === fileName);
 
     if (!bucketKey) {
       const error: Error = new Error();
       Object.assign(error, {
-        message: "The specified key does not exist.",
-        code: "NoSuchKey",
+        message: 'The specified key does not exist.',
+        code: 'NoSuchKey',
         statusCode: 404,
         retryable: false,
       });
@@ -61,9 +58,9 @@ class S3BucketMockService {
       throw error;
     }
 
-    const response: ManagedUpload.SendData = {
+    const response: any = {
       Location: `http://localhost:7000/${bucketName}/${fileName}`,
-      ETag: "621c9c14d75958d4c3ed8ad77c80cde1",
+      ETag: '621c9c14d75958d4c3ed8ad77c80cde1',
       Bucket: bucketName,
       Key: fileName,
     };
@@ -76,31 +73,26 @@ class S3BucketMockService {
    * @param bucketName - the bucket from which to download
    * @param fileName - the name of the file
    */
-  public async download(bucketName: string, fileName: string): Promise<PromiseResult<S3.Types.GetObjectOutput, AWSError>> {
-    const bucket: IBucket | undefined = S3BucketMockService.buckets.find((currentBucket: IBucket) => {
-      return currentBucket.bucketName === bucketName;
-    });
+  public async download(bucketName: string, fileName: string): Promise<GetObjectCommandOutput> {
+    const bucket: IBucket | undefined = S3BucketMockService.buckets.find((currentBucket: IBucket) => currentBucket.bucketName === bucketName);
     if (!bucket) {
       const error: Error = new Error();
 
       Object.assign(error, {
-        message: "The specified bucket does not exist.",
-        code: "NoSuchBucket",
+        message: 'The specified bucket does not exist.',
+        code: 'NoSuchBucket',
         statusCode: 404,
         retryable: false,
       });
       throw error;
     }
-    // @ts-ignore
-    const bucketKey: string | undefined = bucket.files.find((currentFileName: string) => {
-      return currentFileName === fileName;
-    });
+    const bucketKey: string | undefined = bucket.files.find((currentFileName: string) => currentFileName === fileName);
 
     if (!bucketKey) {
       const error: Error = new Error();
       Object.assign(error, {
-        message: "The specified key does not exist.",
-        code: "NoSuchKey",
+        message: 'The specified key does not exist.',
+        code: 'NoSuchKey',
         statusCode: 404,
         retryable: false,
       });
@@ -108,23 +100,18 @@ class S3BucketMockService {
       throw error;
     }
 
-    // @ts-ignore
-    const file: Buffer = fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/${bucketKey}`));
-    const data: S3.Types.GetObjectOutput = {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const file: any = fs.readFileSync(path.resolve(__dirname, `../resources/certificates/base64/${bucketKey}`));
+    const data: GetObjectCommandOutput = {
       Body: file,
       ContentLength: file.length,
-      ETag: "621c9c14d75958d4c3ed8ad77c80cde1",
+      ETag: '621c9c14d75958d4c3ed8ad77c80cde1',
       LastModified: new Date(),
       Metadata: S3BucketMockService.metadata,
+      $metadata: {},
     };
 
-    const response = new Response<S3.Types.GetObjectOutput, AWSError>();
-    Object.assign(response, { data });
-
-    return {
-      $response: response,
-      ...data,
-    };
+    return data;
   }
 }
 
