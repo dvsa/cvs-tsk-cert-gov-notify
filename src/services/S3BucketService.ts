@@ -21,10 +21,10 @@ class S3BucketService {
    * @param fileName - the name of the file
    */
   public async download(bucketName: string, fileName: string): Promise<GetObjectCommandOutput | ServiceException> {
-    console.log(`Downloading file: bucket name: ${bucketName}, key: ${process.env.BRANCH}/${fileName}`);
+    console.log(`Downloading file: bucket name: ${bucketName}, key: ${fileName}`);
     const command = new GetObjectCommand({
       Bucket: bucketName,
-      Key: `${process.env.BRANCH}/${fileName}`,
+      Key: fileName,
     });
 
     const response = await this.s3Client.send(command);
