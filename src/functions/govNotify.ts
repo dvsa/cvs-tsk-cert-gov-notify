@@ -48,8 +48,8 @@ const govNotify: Handler = async (event: SQSEvent, context?: Context, callback?:
 
           if (!notifyPartialParams.shouldEmail || notifyPartialParams.shouldEmail === 'true') {
             if (decodedS3Key.includes('VOSA')) {
-              const emailList = process.env.TFL_EMAIL_LIST?.split(',');
-              for (const email of emailList ?? []) {
+              const emailList = process.env.TFL_EMAIL_LIST?.split(',') ?? [];
+              for (const email of emailList) {
                 notifyPartialParams.email = email;
                 await notifyService.sendNotification(notifyPartialParams);
               }
