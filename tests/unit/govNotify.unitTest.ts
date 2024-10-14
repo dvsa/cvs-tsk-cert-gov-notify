@@ -1,9 +1,9 @@
 import lambdaTester from 'lambda-tester';
-import { Configuration } from '../../src/utils/Configuration';
+import { handler } from '../../src/handler';
+import { DocumentTypes } from '../../src/models';
 import { CertificateDownloadService } from '../../src/services/CertificateDownloadService';
 import { NotificationService } from '../../src/services/NotificationService';
-import { DocumentTypes } from '../../src/models';
-import { handler } from '../../src/handler';
+import { Configuration } from '../../src/utils/Configuration';
 
 describe('gov-notify', () => {
   const event = {
@@ -68,11 +68,7 @@ describe('gov-notify', () => {
         return lambdaTester(handler)
           .event(event)
           .expectResolve((result: any) => {
-            delete result[0].body.content.body;
-            expect(result[0].body.content).toEqual({
-              from_email: 'commercial.vehicle.services@notifications.service.gov.uk',
-              subject: 'BQ91YHQ Annual test|11 March 2019 (Certificate 1 of 2)',
-            });
+            expect(result).toStrictEqual({ batchItemFailures: [] });
           });
       });
 
@@ -83,7 +79,7 @@ describe('gov-notify', () => {
           return lambdaTester(handler)
             .event(event)
             .expectResolve((result: any) => {
-              expect(result[0]).toBe('sent notification');
+              expect(result).toStrictEqual({ batchItemFailures: [] });
               expect(NotificationService.prototype.sendNotification).toHaveBeenCalled();
             });
         });
@@ -97,7 +93,7 @@ describe('gov-notify', () => {
           return lambdaTester(handler)
             .event(eventTfl)
             .expectResolve((result: any) => {
-              expect(result[0]).toBe('sent notification');
+              expect(result).toStrictEqual({ batchItemFailures: [] });
               expect(NotificationService.prototype.sendNotification).toHaveBeenCalled();
             });
         });
@@ -110,7 +106,7 @@ describe('gov-notify', () => {
           return lambdaTester(handler)
             .event(event)
             .expectResolve((result: any) => {
-              expect(result[0]).toBe('sent notification');
+              expect(result).toStrictEqual({ batchItemFailures: [] });
               expect(NotificationService.prototype.sendNotification).toHaveBeenCalled();
             });
         });
@@ -123,7 +119,7 @@ describe('gov-notify', () => {
           return lambdaTester(handler)
             .event(event)
             .expectResolve((result: any) => {
-              expect(result[0]).toBeUndefined();
+              expect(result).toStrictEqual({ batchItemFailures: [] });
               expect(NotificationService.prototype.sendNotification).not.toHaveBeenCalled();
             });
         });
@@ -141,7 +137,7 @@ describe('gov-notify', () => {
           return lambdaTester(handler)
             .event(event)
             .expectResolve((result: any) => {
-              expect(result[0]).toBe('sent notification');
+              expect(result).toStrictEqual({ batchItemFailures: [] });
               expect(NotificationService.prototype.sendNotification).toHaveBeenCalled();
               expect(CertificateDownloadService.prototype.getCertificate).toHaveBeenCalledWith(expectedDecodedS3Key);
             });
@@ -158,7 +154,7 @@ describe('gov-notify', () => {
           return lambdaTester(handler)
             .event(event)
             .expectResolve((result: any) => {
-              expect(result[0]).toBe('sent notification');
+              expect(result).toStrictEqual({ batchItemFailures: [] });
               expect(NotificationService.prototype.sendNotification).toHaveBeenCalled();
               expect(CertificateDownloadService.prototype.getCertificate).toHaveBeenCalledWith(expectedDecodedS3Key);
             });
@@ -167,6 +163,16 @@ describe('gov-notify', () => {
     });
 
     context('when the request is not valid', () => {
+      it('response should resolve with one batch failure', () => {
+        CertificateDownloadService.prototype.getCertificate = jest.fn().mockResolvedValue('');
+        NotificationService.prototype.sendNotification = jest.fn().mockRejectedValueOnce('error sending with email client');
+        return lambdaTester(handler)
+          .event(event)
+          .expectResolve((result: any) => {
+            expect(result).toStrictEqual({ batchItemFailures: [{ itemIdentifier: event.Records[0].messageId }] });
+          });
+      });
+
       it('response should reject', () => lambdaTester(handler)
         .event(undefined)
         .expectReject((result: Error) => {
