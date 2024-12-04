@@ -1,13 +1,14 @@
 // @ts-ignore
-import { NotifyClient } from "notifications-node-client";
-import { DocumentTypes, IPartialParams } from "../models";
-import { Configuration } from "../utils/Configuration";
+import { NotifyClient } from 'notifications-node-client';
+import { DocumentTypes, IPartialParams } from '../models';
+import { Configuration } from '../utils/Configuration';
 
 /**
  * Service class for Certificate Notifications
  */
 class NotificationService {
   private readonly notifyClient: NotifyClient;
+
   private readonly config: Configuration;
 
   constructor(notifyClient: NotifyClient) {
@@ -23,23 +24,14 @@ class NotificationService {
     const emailDetails = {
       personalisation: {
         ...notifyPartialParams.personalisation,
-        link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.fileData, { confirmEmailBeforeDownload: false, isCsv: notifyPartialParams.documentType === DocumentTypes.TFL_FEED ? true : false }),
+        link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.fileData, { confirmEmailBeforeDownload: false, isCsv: notifyPartialParams.documentType === DocumentTypes.TFL_FEED }),
       },
     };
     const templateId = await this.config.getTemplateIdFromEV(notifyPartialParams.documentType);
 
-    console.log(`Sent email using ${templateId} templateId, ${notifyPartialParams.documentType} with ${notifyPartialParams.personalisation.date_of_issue} date of issue`);
     console.log(`Personalisation params: ${JSON.stringify(notifyPartialParams.personalisation)} + email ${notifyPartialParams.email}`);
-    return this.notifyClient
-      .sendEmail(templateId, notifyPartialParams.email, emailDetails)
-      .then((response: any) => {
-        console.log(response);
-        return response.data;
-      })
-      .catch((err: any) => {
-        console.error(err);
-        throw err;
-      });
+    await this.notifyClient.sendEmail(templateId, notifyPartialParams.email, emailDetails);
+    console.log(`Sent email using ${templateId} templateId, ${notifyPartialParams.documentType} with ${notifyPartialParams.personalisation.date_of_issue} date of issue`);
   }
 }
 
