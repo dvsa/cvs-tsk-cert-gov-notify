@@ -1,30 +1,34 @@
 // @ts-ignore
 import { NotifyClient } from 'notifications-node-client';
-import { DocumentTypes, IPartialParams } from '../models';
+import { IPartialParams } from '../models';
 import { Configuration } from '../utils/Configuration';
 
 /**
  * Service class for Certificate Notifications
  */
 class NotificationService {
-  private readonly notifyClient: NotifyClient;
+  private notifyClient: NotifyClient;
 
   private readonly config: Configuration;
 
-  constructor(notifyClient: NotifyClient) {
-    this.notifyClient = notifyClient;
+  constructor() {
     this.config = Configuration.getInstance();
+  }
+
+  public async initializeNotifyClient() {
+    const notifyConfig = await Configuration.getInstance().getNotifyConfig();
+    this.notifyClient = new NotifyClient(notifyConfig.api_key);
   }
 
   /**
    * Sending email with the certificate according to the given params
    * @param params - personalization details,email and certificate
    */
-  public async sendNotification(notifyPartialParams: IPartialParams) {
+  public async sendNotification(notifyPartialParams: IPartialParams, isCsv: boolean = false){
     const emailDetails = {
       personalisation: {
         ...notifyPartialParams.personalisation,
-        link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.fileData, { confirmEmailBeforeDownload: false, isCsv: notifyPartialParams.documentType === DocumentTypes.TFL_FEED }),
+        link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.fileData, { confirmEmailBeforeDownload: false, isCsv }),
       },
     };
     const templateId = await this.config.getTemplateIdFromEV(notifyPartialParams.documentType);

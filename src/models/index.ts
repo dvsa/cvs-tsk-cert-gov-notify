@@ -53,6 +53,5 @@ enum DocumentTypes {
   TFL_FEED = 'TFL_FEED',
 }
 
-export {
-  IInvokeConfig, INotifyConfig, IS3Config, ISecretConfig, IConfig, IPartialParams, DocumentTypes, IGetObjectCommandOutput,
-};
+export { DocumentTypes, IConfig, IGetObjectCommandOutput, IInvokeConfig, INotifyConfig, IPartialParams, IS3Config, ISecretConfig };
+
