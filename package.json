@@ -18,8 +18,8 @@
     "test:unit": "AWS_XRAY_CONTEXT_MISSING=LOG_ERROR SECRET_NAME=cvs-tsk-cert-gov-notify/api-key BRANCH=local BUCKET=local jest --testMatch=\"**/*.unitTest.ts\" --runInBand",
     "test": "npm run test:unit -- --coverage",
     "test-i": "echo 'nothing to do'",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "biome check src",
+    "lint:fix": "npm run lint -- --write",
     "format": "prettier --write .",
     "prepush": "npm t && npm run build && npm run test-i",
     "sonar-scanner": "sonar-scanner",
@@ -40,8 +40,10 @@
     "typedi": "^0.10.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.8.3",
     "@commitlint/cli": "^19.2.1",
     "@commitlint/config-conventional": "^19.1.0",
+    "@dvsa/biome-config": "^0.3.0",
     "@dvsa/eslint-config-ts": "^3.0.1",
     "@types/aws-lambda": "^8.10.39",
     "@types/jest": "^29.5.12",

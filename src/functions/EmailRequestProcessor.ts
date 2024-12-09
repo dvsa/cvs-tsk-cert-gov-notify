@@ -1,63 +1,70 @@
-import { S3Event, S3EventRecord, SQSRecord } from "aws-lambda";
-import { Service } from "typedi";
-import { IGetObjectCommandOutput, IPartialParams } from "../models";
-import { CertificateDownloadService } from "../services/CertificateDownloadService";
-import { EmailGenerationService } from "../services/EmailGenerationService";
-import { NotificationService } from "../services/NotificationService";
-
+import { S3Event, S3EventRecord, SQSRecord } from 'aws-lambda';
+import { Service } from 'typedi';
+import { CertificateRecord } from '../factories/CertificateRecord';
+import { LetterRecord } from '../factories/LetterRecord';
+import { PlateRecord } from '../factories/PlateRecord';
+import { TflFeed } from '../factories/TflFeed';
+import { DocumentTypes, IGetObjectCommandOutput } from '../models';
+import { CertificateDownloadService } from '../services/CertificateDownloadService';
+import { NotificationService } from '../services/NotificationService';
 
 @Service()
 export class EmailRequestProcessor {
-    constructor(
-        private notificationService: NotificationService,
-        private downloadService: CertificateDownloadService,
-        private emailGenerationService: EmailGenerationService
-    ) {}
+	constructor(
+		private notificationService: NotificationService,
+		private downloadService: CertificateDownloadService
+	) {}
 
-    public getRecordS3Objects(record: SQSRecord): (S3EventRecord['s3'])[] { 
-        const s3Records = []
-        const objectPutEvent: S3Event = JSON.parse(record.body);
+	public getRecordS3Objects(record: SQSRecord): S3EventRecord['s3'][] {
+		const s3Records = [];
+		const objectPutEvent: S3Event = JSON.parse(record.body);
 
-        if (objectPutEvent.Records) {
-            for (const s3Record of objectPutEvent.Records) {
-              const s3Object: S3EventRecord['s3'] = s3Record.s3; 
-              s3Records.push(s3Object);
-            }
-        }
+		if (objectPutEvent.Records) {
+			for (const s3Record of objectPutEvent.Records) {
+				const s3Object: S3EventRecord['s3'] = s3Record.s3;
+				s3Records.push(s3Object);
+			}
+		}
 
-        return s3Records;
-    }
+		return s3Records;
+	}
 
-    public async process(s3Record: S3EventRecord['s3']) {
-        const decodedS3Key = decodeURIComponent(s3Record.object.key.replace(/\+/g, ' '));
-        const certificate = await this.downloadService.getCertificate(decodedS3Key, s3Record.bucket.name);
+	public async process(s3Record: S3EventRecord['s3']) {
+		const decodedS3Key = decodeURIComponent(s3Record.object.key.replace(/\+/g, ' '));
+		const certificate = await this.downloadService.getCertificate(decodedS3Key, s3Record.bucket.name);
 
-        if(decodedS3Key.includes('VOSA')) {
-            this.processTflFeedEmail(certificate);
-            return;
-        }
+		const certType = this.calculateCertType(decodedS3Key, certificate);
+		switch (certType) {
+			case DocumentTypes.TFL_FEED:
+				const tflFeed = new TflFeed(this.notificationService);
+				tflFeed.sendEmail(certificate);
+				break;
+			case DocumentTypes.CERTIFICATE:
+				const documentRecord = new CertificateRecord(this.notificationService);
+				documentRecord.sendEmail(certificate);
+				break;
+			case DocumentTypes.MINISTRY_PLATE:
+				const plateRecord = new PlateRecord(this.notificationService);
+				plateRecord.sendEmail(certificate);
+				break;
+			case DocumentTypes.TRAILER_INTO_SERVICE:
+				const letterRecord = new LetterRecord(this.notificationService);
+				letterRecord.sendEmail(certificate);
+				break;
+			default:
+				throw new Error('Unsupported certificate type');
+		}
+	}
 
-        this.processDocumentEmail(certificate);
-    }
+	private calculateCertType(filename: string, certificate: IGetObjectCommandOutput): DocumentTypes {
+		if (filename.includes('VOSA')) {
+			return DocumentTypes.TFL_FEED;
+		}
 
-    private async processTflFeedEmail(feedDocument: IGetObjectCommandOutput) { 
-        feedDocument.Metadata!['cert-type'] = 'TFL_FEED';
-        const partialParams = this.emailGenerationService.generate(feedDocument);
-        const emailList = process.env.TFL_EMAIL_LIST?.split(',') ?? [];
-        for (const email of emailList) {
-            partialParams.email = email;  // replace email with real email from the TFL feed data.
-            await this.sendEmail(partialParams);
-        }
-    }
+		if (certificate.Metadata!['cert-type']) {
+			return DocumentTypes.CERTIFICATE;
+		}
 
-    private async processDocumentEmail(document: IGetObjectCommandOutput) { 
-        const partialParams = this.emailGenerationService.generate(document);
-        await this.sendEmail(partialParams);
-    }
-
-    private async sendEmail(notifyPartialParams: IPartialParams) { 
-        if (!notifyPartialParams?.shouldEmail || notifyPartialParams?.shouldEmail === 'true') {
-            await this.notificationService.sendNotification(notifyPartialParams!);
-        }
-    }
+		return certificate.Metadata!['document-type'] as DocumentTypes;
+	}
 }

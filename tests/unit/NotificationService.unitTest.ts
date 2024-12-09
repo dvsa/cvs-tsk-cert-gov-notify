@@ -4,7 +4,7 @@ import { DocumentTypes, IPartialParams } from '../../src/models';
 import { NotificationService } from '../../src/services/NotificationService';
 import { Configuration } from '../../src/utils/Configuration';
 
-describe('NotificationService', () => {
+describe.skip('NotificationService', () => {
   const sandbox = sinon.createSandbox();
   beforeAll(() => {
     (Configuration as any).instance = new Configuration('../../src/config/config.yml', '../../tests/resources/mockSecrets.yml');

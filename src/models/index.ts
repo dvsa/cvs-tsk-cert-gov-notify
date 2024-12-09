@@ -1,57 +1,65 @@
-import { __MetadataBearer, GetObjectOutput } from '@aws-sdk/client-s3';
+import { GetObjectOutput, __MetadataBearer } from '@aws-sdk/client-s3';
 
 interface IInvokeConfig {
-  params: { apiVersion: string; endpoint?: string };
-  functions: { testResults: { name: string }; techRecords: { name: string; mock: string } };
+	params: { apiVersion: string; endpoint?: string };
+	functions: { testResults: { name: string }; techRecords: { name: string; mock: string } };
 }
 
 interface INotifyConfig {
-  api_key: string;
-  templateId: string;
+	api_key: string;
+	templateId: string;
 }
 
 interface IS3Config {
-  endpoint: string;
+	endpoint: string;
 }
 
 interface ISecretConfig {
-  notify: {
-    api_key: string;
-  };
+	notify: {
+		api_key: string;
+	};
 }
 
 interface IIndexS3Config {
-  [key: string]: IS3Config;
+	[key: string]: IS3Config;
 }
 
 interface IIndexInvokeConfig {
-  [key: string]: IInvokeConfig;
+	[key: string]: IInvokeConfig;
 }
 
 interface IConfig {
-  s3: IIndexS3Config;
-  notify: INotifyConfig;
-  invoke: IIndexInvokeConfig;
+	s3: IIndexS3Config;
+	notify: INotifyConfig;
+	invoke: IIndexInvokeConfig;
 }
 
 interface IPartialParams {
-  personalisation: any;
-  email: string;
-  shouldEmail: string;
-  fileData?: Buffer;
-  documentType: DocumentTypes;
+	personalisation: any;
+	email: string;
+	shouldEmail: string;
+	fileData?: Buffer;
+	documentType: DocumentTypes;
 }
 
 interface IGetObjectCommandOutput extends Omit<GetObjectOutput, 'Body'>, __MetadataBearer {
-  Body: Buffer;
+	Body: Buffer;
 }
 
 enum DocumentTypes {
-  CERTIFICATE = 'certificate',
-  MINISTRY_PLATE = 'VTG6_VTG7',
-  TRAILER_INTO_SERVICE = 'TrailerIntoService',
-  TFL_FEED = 'TFL_FEED',
+	CERTIFICATE = 'certificate',
+	MINISTRY_PLATE = 'VTG6_VTG7',
+	TRAILER_INTO_SERVICE = 'TrailerIntoService',
+	TFL_FEED = 'TFL_FEED',
 }
 
-export { DocumentTypes, IConfig, IGetObjectCommandOutput, IInvokeConfig, INotifyConfig, IPartialParams, IS3Config, ISecretConfig };
-
+export {
+	DocumentTypes,
+	type IConfig,
+	type IGetObjectCommandOutput,
+	type IInvokeConfig,
+	type INotifyConfig,
+	type IPartialParams,
+	type IS3Config,
+	type ISecretConfig,
+};

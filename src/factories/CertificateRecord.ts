@@ -1,0 +1,33 @@
+import { Inject } from 'typedi';
+import { DocumentTypes, IGetObjectCommandOutput, IPartialParams } from '../models';
+import { NotificationService } from '../services/NotificationService';
+import { EmailRequestFactory } from './EmailRequestFactory';
+
+export class CertificateRecord extends EmailRequestFactory {
+	notificationService: NotificationService;
+
+	constructor(@Inject() notificationService: NotificationService) {
+		super(notificationService);
+		this.notificationService = notificationService;
+	}
+
+	protected generatePartialParameters(certificate: IGetObjectCommandOutput): IPartialParams {
+		return {
+			personalisation: {
+				vrms: certificate.Metadata!.vrm,
+				test_type_name: certificate.Metadata!['test-type-name'],
+				date_of_issue: certificate.Metadata!['date-of-issue'],
+				cert_index: certificate.Metadata!['cert-index'],
+				total_certs: certificate.Metadata!['total-certs'],
+				test_type_result: certificate.Metadata!['test-type-result'],
+				cert_type: certificate.Metadata!['cert-type'],
+				file_format: certificate.Metadata!['file-format'],
+				file_size: certificate.Metadata!['file-size'],
+			},
+			email: certificate.Metadata!.email,
+			shouldEmail: certificate.Metadata!['should-email-certificate'],
+			fileData: certificate.Body,
+			documentType: DocumentTypes.CERTIFICATE,
+		};
+	}
+}

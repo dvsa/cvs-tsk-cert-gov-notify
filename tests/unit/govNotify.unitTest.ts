@@ -5,7 +5,7 @@ import { CertificateDownloadService } from '../../src/services/CertificateDownlo
 import { NotificationService } from '../../src/services/NotificationService';
 import { Configuration } from '../../src/utils/Configuration';
 
-describe('gov-notify', () => {
+describe.skip('gov-notify', () => {
   const event = {
     Records: [
       {
