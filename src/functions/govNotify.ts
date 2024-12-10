@@ -1,3 +1,4 @@
+import { S3Client } from '@aws-sdk/client-s3';
 import { Handler, SQSBatchItemFailure, SQSBatchResponse, SQSEvent } from 'aws-lambda';
 import 'reflect-metadata';
 import Container from 'typedi';
@@ -15,6 +16,7 @@ const govNotify: Handler = async (event: SQSEvent): Promise<SQSBatchResponse> =>
 		throw new Error(ERRORS.EventIsEmpty);
 	}
 
+	Container.set(S3Client, new S3Client());
 	const processRequest = Container.get(EmailRequestProcessor);
 	const notificationService = Container.get(NotificationService);
 	notificationService.initializeNotifyClient();

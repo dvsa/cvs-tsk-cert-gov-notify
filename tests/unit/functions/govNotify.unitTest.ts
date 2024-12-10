@@ -1,15 +1,10 @@
 import { Context, S3EventRecord } from 'aws-lambda';
 import 'reflect-metadata';
-import Container from 'typedi';
 import { EmailRequestProcessor } from '../../../src/functions/EmailRequestProcessor';
 import { handler } from '../../../src/handler';
 import { NotificationService } from '../../../src/services/NotificationService';
-import { S3BucketService } from '../../../src/services/S3BucketService';
-import { S3BucketMockService } from '../../models/S3BucketMockService';
 
 describe('gov-notify', () => {
-	Container.set(S3BucketService, new S3BucketMockService());
-
 	beforeEach(() => {
 		jest.resetAllMocks();
 		jest.spyOn(NotificationService.prototype, 'initializeNotifyClient').mockResolvedValue(Promise.resolve());

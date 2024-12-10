@@ -2,6 +2,7 @@
 /* eslint-disable jest/no-conditional-expect */
 import * as fs from 'fs';
 import * as path from 'path';
+import "reflect-metadata";
 import sinon from 'sinon';
 import { CertificateDownloadService } from '../../../src/services/CertificateDownloadService';
 import { Configuration } from '../../../src/utils/Configuration';
