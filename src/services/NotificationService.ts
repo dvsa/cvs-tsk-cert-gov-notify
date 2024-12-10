@@ -1,11 +1,13 @@
 // @ts-ignore
 import { NotifyClient } from 'notifications-node-client';
+import { Service } from 'typedi';
 import { IPartialParams } from '../models';
 import { Configuration } from '../utils/Configuration';
 
 /**
  * Service class for Certificate Notifications
  */
+@Service()
 class NotificationService {
 	private notifyClient: NotifyClient;
 
@@ -16,7 +18,7 @@ class NotificationService {
 	}
 
 	public async initializeNotifyClient() {
-		const notifyConfig = await Configuration.getInstance().getNotifyConfig();
+		const notifyConfig = await this.config.getNotifyConfig();
 		this.notifyClient = new NotifyClient(notifyConfig.api_key);
 	}
 

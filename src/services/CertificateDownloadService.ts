@@ -1,12 +1,14 @@
 /* eslint-disable class-methods-use-this */
 import { IncomingMessage } from 'http';
 import { Stream } from 'stream';
+import { Service } from 'typedi';
 import { IGetObjectCommandOutput } from '../models';
 import { S3BucketService } from './S3BucketService';
 
 /**
  * Service class for Certificate Generation
  */
+@Service()
 class CertificateDownloadService {
 	private readonly s3Client: S3BucketService;
 

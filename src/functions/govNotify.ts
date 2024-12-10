@@ -1,9 +1,5 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable consistent-return */
-/* eslint-disable import/no-unresolved */
-import { Callback, Context, Handler, SQSBatchItemFailure, SQSBatchResponse, SQSEvent } from 'aws-lambda';
-// @ts-ignore
+import { Handler, SQSBatchItemFailure, SQSBatchResponse, SQSEvent } from 'aws-lambda';
+import 'reflect-metadata';
 import Container from 'typedi';
 import { ERRORS } from '../assets/enum';
 import { NotificationService } from '../services/NotificationService';
@@ -12,15 +8,8 @@ import { EmailRequestProcessor } from './EmailRequestProcessor';
 /**
  * λ function to process an SQS record and initialise email notifications for generated certificates
  * @param event - SQS event
- * @param context - λ Context
- * @param callback - callback function
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const govNotify: Handler = async (
-	event: SQSEvent,
-	context?: Context,
-	callback?: Callback
-): Promise<SQSBatchResponse> => {
+const govNotify: Handler = async (event: SQSEvent): Promise<SQSBatchResponse> => {
 	if (!event || !event.Records || !Array.isArray(event.Records) || !event.Records.length) {
 		console.error('ERROR: event is not defined.');
 		throw new Error(ERRORS.EventIsEmpty);

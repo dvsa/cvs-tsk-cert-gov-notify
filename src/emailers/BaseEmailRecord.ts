@@ -2,7 +2,7 @@ import { Inject } from 'typedi';
 import { IGetObjectCommandOutput, IPartialParams } from '../models';
 import { NotificationService } from '../services/NotificationService';
 
-export abstract class EmailRequestFactory {
+export abstract class BaseEmailRecord {
 	protected notificationService: NotificationService;
 
 	constructor(@Inject() notificationService: NotificationService) {

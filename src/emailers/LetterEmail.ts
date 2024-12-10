@@ -1,9 +1,9 @@
 import { Inject } from 'typedi';
 import { DocumentTypes, IGetObjectCommandOutput, IPartialParams } from '../models';
 import { NotificationService } from '../services/NotificationService';
-import { EmailRequestFactory } from './EmailRequestFactory';
+import { BaseEmailRecord } from './BaseEmailRecord';
 
-export class PlateRecord extends EmailRequestFactory {
+export class LetterEmail extends BaseEmailRecord {
 	notificationService: NotificationService;
 
 	constructor(@Inject() notificationService: NotificationService) {
@@ -16,10 +16,10 @@ export class PlateRecord extends EmailRequestFactory {
 			email: certificate.Metadata!.email,
 			shouldEmail: certificate.Metadata!['should-email-certificate'],
 			fileData: certificate.Body,
-			documentType: DocumentTypes.MINISTRY_PLATE,
+			documentType: DocumentTypes.TRAILER_INTO_SERVICE,
 			personalisation: {
-				vrms: certificate.Metadata!.vrm,
 				date_of_issue: certificate.Metadata!['date-of-issue'],
+				trailer_id: certificate.Metadata!['trailer-id'],
 			},
 		};
 	}

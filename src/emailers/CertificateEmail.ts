@@ -1,9 +1,9 @@
 import { Inject } from 'typedi';
 import { DocumentTypes, IGetObjectCommandOutput, IPartialParams } from '../models';
 import { NotificationService } from '../services/NotificationService';
-import { EmailRequestFactory } from './EmailRequestFactory';
+import { BaseEmailRecord } from './BaseEmailRecord';
 
-export class CertificateRecord extends EmailRequestFactory {
+export class CertificateEmail extends BaseEmailRecord {
 	notificationService: NotificationService;
 
 	constructor(@Inject() notificationService: NotificationService) {
