@@ -1,4 +1,5 @@
 import { Inject } from 'typedi';
+import { ERRORS } from '../assets/enum';
 import { DocumentTypes, IGetObjectCommandOutput, IPartialParams } from '../models';
 import { NotificationService } from '../services/NotificationService';
 import { BaseEmailRecord } from './BaseEmailRecord';
@@ -22,5 +23,13 @@ export class LetterEmail extends BaseEmailRecord {
 				trailer_id: certificate.Metadata!['trailer-id'],
 			},
 		};
+	}
+
+	protected getTemplateId(): string {
+		if (process.env.TRAILER_INTO_SERVICE_TEMPLATE_ID) {
+			return process.env.TRAILER_INTO_SERVICE_TEMPLATE_ID;
+		}
+
+		throw new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST);
 	}
 }

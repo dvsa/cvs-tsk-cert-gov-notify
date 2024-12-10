@@ -9,7 +9,7 @@ import { load } from 'js-yaml';
 // @ts-ignore
 import * as yml from 'node-yaml';
 import { ERRORS } from '../assets/enum';
-import { DocumentTypes, IConfig, IInvokeConfig, INotifyConfig, IS3Config } from '../models';
+import { IConfig, IInvokeConfig, INotifyConfig, IS3Config } from '../models';
 
 /**
  * Configuration class for retrieving project config
@@ -105,35 +105,6 @@ class Configuration {
 		}
 
 		return this.config.notify;
-	}
-
-	/**
-	 * Retrieves the templateId from environment variable
-	 */
-	// eslint-disable-next-line @typescript-eslint/require-await
-	public async getTemplateIdFromEV(templateType: DocumentTypes): Promise<string> {
-		if (!process.env.BRANCH || process.env.BRANCH === 'local') {
-			if (!this.config.notify.templateId) {
-				throw new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST);
-			} else {
-				return this.config.notify.templateId;
-			}
-		} else {
-			switch (templateType) {
-				case DocumentTypes.CERTIFICATE:
-					return process.env.CERTIFICATE_TEMPLATE_ID!;
-				case DocumentTypes.MINISTRY_PLATE:
-					return process.env.PLATE_TEMPLATE_ID!;
-				case DocumentTypes.TRAILER_INTO_SERVICE:
-					return process.env.TRAILER_INTO_SERVICE_TEMPLATE_ID!;
-				case DocumentTypes.TFL_FEED:
-					return process.env.TFL_FEED_TEMPLATE_ID!;
-				case DocumentTypes.VTG_VTP12:
-					return process.env.VTG_VTP12_TEMPLATE_ID!;
-				default:
-					throw new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST);
-			}
-		}
 	}
 
 	/**

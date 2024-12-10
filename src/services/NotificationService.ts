@@ -26,7 +26,7 @@ class NotificationService {
 	 * Sending email with the certificate according to the given params
 	 * @param params - personalization details,email and certificate
 	 */
-	public async sendNotification(notifyPartialParams: IPartialParams, isCsv = false) {
+	public async sendNotification(notifyPartialParams: IPartialParams, templateId: string, isCsv = false) {
 		if (!notifyPartialParams?.shouldEmail || notifyPartialParams?.shouldEmail === 'true') {
 			const emailDetails = {
 				personalisation: {
@@ -37,7 +37,6 @@ class NotificationService {
 					}),
 				},
 			};
-			const templateId = await this.config.getTemplateIdFromEV(notifyPartialParams.documentType);
 
 			console.log(
 				`Personalisation params: ${JSON.stringify(notifyPartialParams.personalisation)} + email ${notifyPartialParams.email}`

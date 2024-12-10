@@ -11,8 +11,9 @@ export abstract class BaseEmailRecord {
 
 	public sendEmail(certificate: IGetObjectCommandOutput): void {
 		const partialParams = this.generatePartialParameters(certificate);
-		this.notificationService.sendNotification(partialParams);
+		this.notificationService.sendNotification(partialParams, this.getTemplateId());
 	}
 
 	protected abstract generatePartialParameters(certificate: IGetObjectCommandOutput): IPartialParams;
+	protected abstract getTemplateId(): string;
 }

@@ -9,6 +9,11 @@ import { NotificationService } from '../../../src/services/NotificationService';
 
 describe('Emailers', () => {
 	const notificationService: NotificationService = new NotificationService();
+	process.env.CERTIFICATE_TEMPLATE_ID = '12345';
+	process.env.TRAILER_INTO_SERVICE_TEMPLATE_ID = '12345';
+	process.env.PLATE_TEMPLATE_ID = '12345';
+	process.env.TFL_FEED_TEMPLATE_ID = '12345';
+	process.env.VTG_VTP12_TEMPLATE_ID = '12345';
 
 	beforeEach(() => {
 		jest.resetAllMocks();
@@ -38,23 +43,26 @@ describe('Emailers', () => {
 
 			await documentRecord.sendEmail(certificate);
 
-			expect(spy).toHaveBeenCalledWith({
-				email: 'testemail@testdomain.com',
-				shouldEmail: 'true',
-				fileData: '1234',
-				documentType: 'certificate',
-				personalisation: {
-					vrms: 'BQ91YHQ',
-					test_type_name: 'Annual test',
-					date_of_issue: '11 March 2019',
-					total_certs: '2',
-					test_type_result: 'prs',
-					cert_type: 'PSV_PRS',
-					cert_index: '1',
-					file_format: 'pdf',
-					file_size: '306784',
+			expect(spy).toHaveBeenCalledWith(
+				{
+					email: 'testemail@testdomain.com',
+					shouldEmail: 'true',
+					fileData: '1234',
+					documentType: 'certificate',
+					personalisation: {
+						vrms: 'BQ91YHQ',
+						test_type_name: 'Annual test',
+						date_of_issue: '11 March 2019',
+						total_certs: '2',
+						test_type_result: 'prs',
+						cert_type: 'PSV_PRS',
+						cert_index: '1',
+						file_format: 'pdf',
+						file_size: '306784',
+					},
 				},
-			});
+				'12345'
+			);
 		});
 	});
 
@@ -75,16 +83,19 @@ describe('Emailers', () => {
 
 			await documentRecord.sendEmail(certificate);
 
-			expect(spy).toHaveBeenCalledWith({
-				email: 'test@test.com',
-				shouldEmail: 'true',
-				fileData: '1234',
-				documentType: 'TrailerIntoService',
-				personalisation: {
-					trailer_id: '12345',
-					date_of_issue: '12345',
+			expect(spy).toHaveBeenCalledWith(
+				{
+					email: 'test@test.com',
+					shouldEmail: 'true',
+					fileData: '1234',
+					documentType: 'TrailerIntoService',
+					personalisation: {
+						trailer_id: '12345',
+						date_of_issue: '12345',
+					},
 				},
-			});
+				'12345'
+			);
 		});
 	});
 
@@ -105,16 +116,19 @@ describe('Emailers', () => {
 
 			await documentRecord.sendEmail(certificate);
 
-			expect(spy).toHaveBeenCalledWith({
-				email: 'test@test.com',
-				shouldEmail: 'true',
-				fileData: '1234',
-				documentType: 'VTG6_VTG7',
-				personalisation: {
-					vrms: '12345',
-					date_of_issue: '12345',
+			expect(spy).toHaveBeenCalledWith(
+				{
+					email: 'test@test.com',
+					shouldEmail: 'true',
+					fileData: '1234',
+					documentType: 'VTG6_VTG7',
+					personalisation: {
+						vrms: '12345',
+						date_of_issue: '12345',
+					},
 				},
-			});
+				'12345'
+			);
 		});
 	});
 
@@ -138,6 +152,7 @@ describe('Emailers', () => {
 					documentType: 'TFL_FEED',
 					personalisation: {},
 				},
+				'12345',
 				true
 			);
 			expect(spy).toHaveBeenCalledTimes(1);
@@ -161,6 +176,7 @@ describe('Emailers', () => {
 					documentType: 'TFL_FEED',
 					personalisation: {},
 				},
+				'12345',
 				true
 			);
 			expect(spy).toHaveBeenCalledTimes(2);
@@ -197,17 +213,20 @@ describe('Emailers', () => {
 
 			await documentRecord.sendEmail(certificate);
 
-			expect(spy).toHaveBeenCalledWith({
-				email: 'test@test.com',
-				shouldEmail: 'true',
-				fileData: '1234',
-				documentType: 'VTG_VTP12',
-				personalisation: {
-					vrms: '12345',
-					date_of_issue: '12345',
-					certificate_name: 'VTG12',
+			expect(spy).toHaveBeenCalledWith(
+				{
+					email: 'test@test.com',
+					shouldEmail: 'true',
+					fileData: '1234',
+					documentType: 'VTG_VTP12',
+					personalisation: {
+						vrms: '12345',
+						date_of_issue: '12345',
+						certificate_name: 'VTG12',
+					},
 				},
-			});
+				'12345'
+			);
 		});
 
 		it('should return me correct partial params for a VTP12 record', async () => {
@@ -226,17 +245,20 @@ describe('Emailers', () => {
 
 			await documentRecord.sendEmail(certificate);
 
-			expect(spy).toHaveBeenCalledWith({
-				email: 'test@test.com',
-				shouldEmail: 'true',
-				fileData: '1234',
-				documentType: 'VTG_VTP12',
-				personalisation: {
-					vrms: '12345',
-					date_of_issue: '12345',
-					certificate_name: 'VTP12',
+			expect(spy).toHaveBeenCalledWith(
+				{
+					email: 'test@test.com',
+					shouldEmail: 'true',
+					fileData: '1234',
+					documentType: 'VTG_VTP12',
+					personalisation: {
+						vrms: '12345',
+						date_of_issue: '12345',
+						certificate_name: 'VTP12',
+					},
 				},
-			});
+				'12345'
+			);
 		});
 	});
 });
