@@ -3,17 +3,18 @@ import { CertificateEmail } from '../../../src/emailers/CertificateEmail';
 import { LetterEmail } from '../../../src/emailers/LetterEmail';
 import { PlateEmail } from '../../../src/emailers/PlateEmail';
 import { TflFeedEmail } from '../../../src/emailers/TflFeedEmail';
+import { VtgVtpEmail } from '../../../src/emailers/VtgVtpEmail';
 import { IGetObjectCommandOutput } from '../../../src/models';
 import { NotificationService } from '../../../src/services/NotificationService';
 
-describe('EmailRequestFactory', () => {
+describe('Emailers', () => {
 	const notificationService: NotificationService = new NotificationService();
 
 	beforeEach(() => {
 		jest.resetAllMocks();
 	});
 
-	describe('CertificateRecord', () => {
+	describe('CertificateEmail', () => {
 		it('should return me correct partial params for a certificate record', async () => {
 			const certificate: IGetObjectCommandOutput = {
 				Metadata: {
@@ -57,7 +58,7 @@ describe('EmailRequestFactory', () => {
 		});
 	});
 
-	describe('LetterRecord', () => {
+	describe('LetterEmail', () => {
 		it('should return me correct partial params for a letter record', async () => {
 			const certificate: IGetObjectCommandOutput = {
 				Metadata: {
@@ -87,7 +88,7 @@ describe('EmailRequestFactory', () => {
 		});
 	});
 
-	describe('PlateRecord', () => {
+	describe('PlateEmail', () => {
 		it('should return me correct partial params for a plate record', async () => {
 			const certificate: IGetObjectCommandOutput = {
 				Metadata: {
@@ -117,7 +118,7 @@ describe('EmailRequestFactory', () => {
 		});
 	});
 
-	describe('TFLFeed', () => {
+	describe('TFLFeedEmail', () => {
 		it('should return me correct partial params for a TFL feed record', async () => {
 			process.env.TFL_EMAIL_LIST = 'email1@email.com';
 			const certificate: IGetObjectCommandOutput = {
@@ -176,6 +177,66 @@ describe('EmailRequestFactory', () => {
 
 			await documentRecord.sendEmail(certificate);
 			expect(spy).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('VTP/VTG12Email', () => {
+		it('should return me correct partial params for a VTG12 record', async () => {
+			const certificate: IGetObjectCommandOutput = {
+				Metadata: {
+					'certificate-type': 'VTG12',
+					vrm: '12345',
+					'date-of-issue': '12345',
+					email: 'test@test.com',
+					'should-email-certificate': 'true',
+				},
+				Body: '1234' as unknown as Buffer,
+			} as unknown as IGetObjectCommandOutput;
+			const documentRecord = new VtgVtpEmail(notificationService);
+			const spy = jest.spyOn(notificationService, 'sendNotification').mockResolvedValue(void 0);
+
+			await documentRecord.sendEmail(certificate);
+
+			expect(spy).toHaveBeenCalledWith({
+				email: 'test@test.com',
+				shouldEmail: 'true',
+				fileData: '1234',
+				documentType: 'VTG_VTP12',
+				personalisation: {
+					vrms: '12345',
+					date_of_issue: '12345',
+					certificate_name: 'VTG12',
+				},
+			});
+		});
+
+		it('should return me correct partial params for a VTP12 record', async () => {
+			const certificate: IGetObjectCommandOutput = {
+				Metadata: {
+					'certificate-type': 'VTP12',
+					vrm: '12345',
+					'date-of-issue': '12345',
+					email: 'test@test.com',
+					'should-email-certificate': 'true',
+				},
+				Body: '1234' as unknown as Buffer,
+			} as unknown as IGetObjectCommandOutput;
+			const documentRecord = new VtgVtpEmail(notificationService);
+			const spy = jest.spyOn(notificationService, 'sendNotification').mockResolvedValue(void 0);
+
+			await documentRecord.sendEmail(certificate);
+
+			expect(spy).toHaveBeenCalledWith({
+				email: 'test@test.com',
+				shouldEmail: 'true',
+				fileData: '1234',
+				documentType: 'VTG_VTP12',
+				personalisation: {
+					vrms: '12345',
+					date_of_issue: '12345',
+					certificate_name: 'VTP12',
+				},
+			});
 		});
 	});
 });

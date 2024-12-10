@@ -51,6 +51,7 @@ enum DocumentTypes {
 	MINISTRY_PLATE = 'VTG6_VTG7',
 	TRAILER_INTO_SERVICE = 'TrailerIntoService',
 	TFL_FEED = 'TFL_FEED',
+	VTG_VTP12 = 'VTG_VTP12',
 }
 
 export {

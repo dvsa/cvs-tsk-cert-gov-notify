@@ -3,6 +3,7 @@ import { CertificateEmail } from '../emailers/CertificateEmail';
 import { LetterEmail } from '../emailers/LetterEmail';
 import { PlateEmail } from '../emailers/PlateEmail';
 import { TflFeedEmail } from '../emailers/TflFeedEmail';
+import { VtgVtpEmail } from '../emailers/VtgVtpEmail';
 import { DocumentTypes, IGetObjectCommandOutput } from '../models';
 import { NotificationService } from './NotificationService';
 
@@ -13,6 +14,10 @@ export class EmailAdapterStrategy {
 	public getStrategy(filename: string, certificate: IGetObjectCommandOutput) {
 		if (filename.includes('VOSA')) {
 			return new TflFeedEmail(this.notificationService);
+		}
+
+		if (certificate.Metadata!['cert-type'] === 'VTG12' || certificate.Metadata!['cert-type'] === 'VTP12') {
+			return new VtgVtpEmail(this.notificationService);
 		}
 
 		if (certificate.Metadata!['cert-type']) {

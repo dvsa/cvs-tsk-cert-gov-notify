@@ -128,6 +128,8 @@ class Configuration {
 					return process.env.TRAILER_INTO_SERVICE_TEMPLATE_ID!;
 				case DocumentTypes.TFL_FEED:
 					return process.env.TFL_FEED_TEMPLATE_ID!;
+				case DocumentTypes.VTG_VTP12:
+					return process.env.VTG_VTP12_TEMPLATE_ID!;
 				default:
 					throw new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST);
 			}
