@@ -200,7 +200,7 @@ describe('Emailers', () => {
 		it('should return me correct partial params for a VTG12 record', async () => {
 			const certificate: IGetObjectCommandOutput = {
 				Metadata: {
-					'certificate-type': 'VTG12',
+					'cert-type': 'VTG12',
 					vrm: '12345',
 					'date-of-issue': '12345',
 					email: 'test@test.com',
@@ -232,7 +232,7 @@ describe('Emailers', () => {
 		it('should return me correct partial params for a VTP12 record', async () => {
 			const certificate: IGetObjectCommandOutput = {
 				Metadata: {
-					'certificate-type': 'VTP12',
+					'cert-type': 'VTP12',
 					vrm: '12345',
 					'date-of-issue': '12345',
 					email: 'test@test.com',

@@ -21,7 +21,7 @@ export class VtgVtpEmail extends BaseEmailRecord {
 			personalisation: {
 				vrms: certificate.Metadata!.vrm,
 				date_of_issue: certificate.Metadata!['date-of-issue'],
-				certificate_name: certificate.Metadata!['certificate-type'],
+				certificate_name: certificate.Metadata!['cert-type'],
 			},
 		};
 	}

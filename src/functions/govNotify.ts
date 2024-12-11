@@ -19,7 +19,7 @@ const govNotify: Handler = async (event: SQSEvent): Promise<SQSBatchResponse> =>
 	Container.set(S3Client, new S3Client());
 	const processRequest = Container.get(EmailRequestProcessor);
 	const notificationService = Container.get(NotificationService);
-	notificationService.initializeNotifyClient();
+	await notificationService.initializeNotifyClient();
 
 	const batchItemFailures: SQSBatchItemFailure[] = [];
 
