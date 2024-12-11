@@ -9,9 +9,9 @@ export abstract class BaseEmailRecord {
 		this.notificationService = notificationService;
 	}
 
-	public sendEmail(certificate: IGetObjectCommandOutput): void {
+	public async sendEmail(certificate: IGetObjectCommandOutput): Promise<void> {
 		const partialParams = this.generatePartialParameters(certificate);
-		this.notificationService.sendNotification(partialParams, this.getTemplateId());
+		await this.notificationService.sendNotification(partialParams, this.getTemplateId());
 	}
 
 	protected abstract generatePartialParameters(certificate: IGetObjectCommandOutput): IPartialParams;
