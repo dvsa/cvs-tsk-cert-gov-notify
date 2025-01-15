@@ -1,40 +1,37 @@
-import S3 from "aws-sdk/clients/s3";
-import { AWSError, config as AWSConfig } from "aws-sdk";
-import { Configuration } from "../utils/Configuration";
-import { IS3Config } from "../models";
-import { PromiseResult } from "aws-sdk/lib/request";
-/* tslint:disable */
-const AWSXRay = require("aws-xray-sdk");
-
-/* tslint:enable */
+import { GetObjectCommand, GetObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
+import { ServiceException } from '@smithy/smithy-client';
+import AWSXRay from 'aws-xray-sdk';
+import { Service } from 'typedi';
+import { IS3Config } from '../models';
+import { Configuration } from '../utils/Configuration';
 
 /**
  * Service class for communicating with Simple Storage Service
  */
+@Service()
 class S3BucketService {
-  public readonly s3Client: S3;
+	public readonly s3Client: S3Client;
 
-  constructor(s3Client: S3) {
-    const config: IS3Config = Configuration.getInstance().getS3Config();
-    this.s3Client = AWSXRay.captureAWSClient(s3Client);
+	constructor(s3Client: S3Client) {
+		const config: IS3Config = Configuration.getInstance().getS3Config();
+		this.s3Client = AWSXRay.captureAWSv3Client(new S3Client({ ...s3Client, ...config }));
+	}
 
-    AWSConfig.s3 = config;
-  }
+	/**
+	 * Downloads a file from an S3 bucket
+	 * @param bucketName - the bucket from which to download
+	 * @param fileName - the name of the file
+	 */
+	public async download(bucketName: string, fileName: string): Promise<GetObjectCommandOutput | ServiceException> {
+		console.log(`Downloading file: bucket name: ${bucketName}, key: ${fileName}`);
+		const command = new GetObjectCommand({
+			Bucket: bucketName,
+			Key: fileName,
+		});
 
-  /**
-   * Downloads a file from an S3 bucket
-   * @param bucketName - the bucket from which to download
-   * @param fileName - the name of the file
-   */
-  public download(bucketName: string, fileName: string): Promise<PromiseResult<S3.Types.GetObjectOutput, AWSError>> {
-    console.log(`Downloading file: bucket name: ${bucketName}, key: ${process.env.BRANCH}/${fileName}`);
-    return this.s3Client
-      .getObject({
-        Bucket: bucketName,
-        Key: `${fileName}`,
-      })
-      .promise();
-  }
+		const response = await this.s3Client.send(command);
+		return response;
+	}
 }
 
 export { S3BucketService };
