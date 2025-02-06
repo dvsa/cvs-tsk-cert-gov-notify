@@ -9,12 +9,12 @@ export class TflFeedEmail extends BaseEmailRecord {
 		super(notificationService);
 	}
 
-	public async sendEmail(certificate: IGetObjectCommandOutput) {
+	public async sendEmail(certificate: IGetObjectCommandOutput, fileName: string | null = null) {
 		const emailList = process.env.TFL_EMAIL_LIST?.split(',') ?? [];
 		const partialParams = this.generatePartialParameters(certificate);
 		for (const email of emailList) {
 			partialParams.email = email; // replace email with real email from the TFL feed data.
-			await this.notificationService.sendNotification(partialParams!, this.getTemplateId(), true);
+			await this.notificationService.sendNotification(partialParams!, this.getTemplateId(), fileName);
 		}
 	}
 

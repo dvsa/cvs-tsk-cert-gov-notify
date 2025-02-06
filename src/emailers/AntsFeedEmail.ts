@@ -9,12 +9,12 @@ export class AntsFeedEmail extends BaseEmailRecord {
 		super(notificationService);
 	}
 
-	public async sendEmail(certificate: IGetObjectCommandOutput) {
+	public async sendEmail(certificate: IGetObjectCommandOutput, fileName: string | null = null) {
 		const emailList = process.env.ANTS_EMAIL_LIST?.split(',') ?? [];
 		const partialParams = this.generatePartialParameters(certificate);
 		for (const email of emailList) {
 			partialParams.email = email; // replace email with real email from the ANTS feed data.
-			await this.notificationService.sendNotification(partialParams!, this.getTemplateId(), true);
+			await this.notificationService.sendNotification(partialParams!, this.getTemplateId(), fileName);
 		}
 	}
 

@@ -58,7 +58,7 @@ describe('NotificationService', () => {
 		it('should allow me to send an email and prepare the upload', async () => {
 			mockPrepareUpload.mockReturnValue('uploaded data');
 
-			await notificationService.sendNotification(params, '12345', true);
+			await notificationService.sendNotification(params, '12345', null);
 
 			expect(mockSendEmail).toHaveBeenCalledWith('12345', 'testemail@testdomain.com', {
 				personalisation: { ...params.personalisation, link_to_document: 'uploaded data' },
@@ -69,7 +69,7 @@ describe('NotificationService', () => {
 			mockPrepareUpload.mockReturnValue('uploaded data');
 			params.shouldEmail = 'false';
 
-			await notificationService.sendNotification(params, '12345', true);
+			await notificationService.sendNotification(params, '12345', 'filename');
 
 			expect(mockSendEmail).not.toHaveBeenCalled();
 		});

@@ -28,6 +28,6 @@ export class EmailRequestProcessor {
 		const decodedS3Key = decodeURIComponent(s3Record.object.key.replace(/\+/g, ' '));
 		const certificate = await this.downloadService.getCertificate(decodedS3Key, s3Record.bucket.name);
 		const emailer = this.emailAdapterStrategy.getStrategy(decodedS3Key, certificate);
-		await emailer.sendEmail(certificate);
+		await emailer.sendEmail(certificate, decodedS3Key);
 	}
 }

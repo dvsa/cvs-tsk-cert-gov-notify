@@ -26,14 +26,18 @@ class NotificationService {
 	 * Sending email with the certificate according to the given params
 	 * @param params - personalization details,email and certificate
 	 */
-	public async sendNotification(notifyPartialParams: IPartialParams, templateId: string, isCsv = false) {
+	public async sendNotification(
+		notifyPartialParams: IPartialParams,
+		templateId: string,
+		filename: string | null = null
+	) {
 		if (!notifyPartialParams?.shouldEmail || notifyPartialParams?.shouldEmail === 'true') {
 			const emailDetails = {
 				personalisation: {
 					...notifyPartialParams.personalisation,
 					link_to_document: this.notifyClient.prepareUpload(notifyPartialParams.fileData, {
 						confirmEmailBeforeDownload: false,
-						isCsv,
+						filename,
 					}),
 				},
 			};
