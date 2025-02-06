@@ -1,157 +1,143 @@
+import {
+	GetSecretValueCommandInput,
+	GetSecretValueCommandOutput,
+	SecretsManager,
+} from '@aws-sdk/client-secrets-manager';
+import AWSXRay from 'aws-xray-sdk';
+import { load } from 'js-yaml';
+/* eslint-disable security/detect-object-injection */
 // @ts-ignore
-import * as yml from "node-yaml";
-import { DocumentTypes, IConfig, IInvokeConfig, INotifyConfig, IS3Config } from "../models";
-import { ERRORS } from "../assets/enum";
-import SecretsManager, { GetSecretValueRequest, GetSecretValueResponse } from "aws-sdk/clients/secretsmanager";
-import { safeLoad } from "js-yaml";
-/* tslint:disable */
-const AWSXRay = require("aws-xray-sdk");
+import * as yml from 'node-yaml';
+import { ERRORS } from '../assets/enum';
+import { IConfig, IInvokeConfig, INotifyConfig, IS3Config } from '../models';
 
 /**
  * Configuration class for retrieving project config
  */
 class Configuration {
-  private static instance: Configuration;
-  private readonly config: IConfig;
-  private readonly secretPath: string;
-  private secretsClient: SecretsManager;
+	private static instance: Configuration;
 
-  constructor(configPath: string, secretsPath: string) {
-    this.secretsClient = AWSXRay.captureAWSClient(new SecretsManager({ region: "eu-west-1" }));
-    this.secretPath = secretsPath;
-    const config = yml.readSync(configPath);
+	private readonly config: IConfig;
 
-    // Replace environment variable references
-    let sConfig: string = JSON.stringify(config);
-    const envRegex: RegExp = /\${(\w+\b):?(\w+\b)?}/g;
-    const matches: RegExpMatchArray | null = sConfig.match(envRegex);
+	private readonly secretPath: string;
 
-    if (matches) {
-      matches.forEach((match: string) => {
-        envRegex.lastIndex = 0;
-        const captureGroups: RegExpExecArray = envRegex.exec(match) as RegExpExecArray;
+	private secretsClient: SecretsManager;
 
-        // Insert the environment variable if available. If not, insert placeholder. If no placeholder, leave it as is.
-        sConfig = sConfig.replace(match, process.env[captureGroups[1]] || captureGroups[2] || captureGroups[1]);
-      });
-    }
-    this.config = JSON.parse(sConfig);
-  }
+	constructor(configPath: string, secretsPath: string) {
+		this.secretsClient = AWSXRay.captureAWSv3Client(
+			new SecretsManager({
+				region: 'eu-west-1',
+			})
+		);
+		this.secretPath = secretsPath;
+		const config = yml.readSync(configPath);
 
-  /**
-   * Retrieves the singleton instance of Configuration
-   * @returns Configuration
-   */
-  public static getInstance(): Configuration {
-    if (!this.instance) {
-      this.instance = new Configuration("../config/config.yml", "../config/secrets.yml");
-    }
+		// Replace environment variable references
+		let sConfig: string = JSON.stringify(config);
+		// eslint-disable-next-line security/detect-unsafe-regex
+		const envRegex: RegExp = /\${(\w+\b):?(\w+\b)?}/g;
+		const matches: RegExpMatchArray | null = sConfig.match(envRegex);
 
-    return Configuration.instance;
-  }
+		if (matches) {
+			matches.forEach((match: string) => {
+				envRegex.lastIndex = 0;
+				const captureGroups: RegExpExecArray = envRegex.exec(match) as RegExpExecArray;
 
-  /**
-   * Retrieves the Lambda Invoke config
-   * @returns IInvokeConfig
-   */
-  public getInvokeConfig(): IInvokeConfig {
-    if (!this.config.invoke) {
-      throw new Error(ERRORS.LambdaInvokeConfigNotDefined);
-    }
+				// Insert the environment variable if available. If not, insert placeholder. If no placeholder, leave it as is.
+				sConfig = sConfig.replace(match, process.env[captureGroups[1]] || captureGroups[2] || captureGroups[1]);
+			});
+		}
+		this.config = JSON.parse(sConfig);
+	}
 
-    // Not defining BRANCH will default to local
-    const env: string = !process.env.BRANCH || process.env.BRANCH === "local" ? "local" : "remote";
+	/**
+	 * Retrieves the singleton instance of Configuration
+	 * @returns Configuration
+	 */
+	public static getInstance(): Configuration {
+		if (!this.instance) {
+			this.instance = new Configuration('../config/config.yml', '../config/secrets.yml');
+		}
 
-    return this.config.invoke[env];
-  }
+		return Configuration.instance;
+	}
 
-  /**
-   * Retrieves the S3 config
-   * @returns IS3Config
-   */
-  public getS3Config(): IS3Config {
-    if (!this.config.s3) {
-      throw new Error(ERRORS.DynamoDBConfigNotDefined);
-    }
+	/**
+	 * Retrieves the Lambda Invoke config
+	 * @returns IInvokeConfig
+	 */
+	public getInvokeConfig(): IInvokeConfig {
+		if (!this.config.invoke) {
+			throw new Error(ERRORS.LambdaInvokeConfigNotDefined);
+		}
 
-    // Not defining BRANCH will default to local
-    const env: string = !process.env.BRANCH || process.env.BRANCH === "local" ? "local" : "remote";
+		// Not defining BRANCH will default to local
+		const env: string = !process.env.BRANCH || process.env.BRANCH === 'local' ? 'local' : 'remote';
 
-    return this.config.s3[env];
-  }
+		return this.config.invoke[env];
+	}
 
-  /**
-   * Retrieves the MOT config
-   * @returns INotifyConfig
-   */
-  public async getNotifyConfig(): Promise<INotifyConfig> {
-    if (!this.config.notify) {
-      throw new Error(ERRORS.NotifyConfigNotDefined);
-    }
-    if (!this.config.notify.api_key) {
-      await this.setSecrets();
-    }
+	/**
+	 * Retrieves the S3 config
+	 * @returns IS3Config
+	 */
+	public getS3Config(): IS3Config {
+		if (!this.config.s3) {
+			throw new Error(ERRORS.DynamoDBConfigNotDefined);
+		}
 
-    return this.config.notify;
-  }
+		// Not defining BRANCH will default to local
+		const env: string = !process.env.BRANCH || process.env.BRANCH === 'local' ? 'local' : 'remote';
 
-  /**
-   * Retrieves the templateId from environment variable
-   */
-  public async getTemplateIdFromEV(templateType: DocumentTypes): Promise<string> {
-    if (!process.env.BRANCH || process.env.BRANCH === "local") {
-      if (!this.config.notify.templateId) {
-        throw new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST);
-      } else {
-        return this.config.notify.templateId;
-      }
-    } else {
-      switch (templateType) {
-        case DocumentTypes.CERTIFICATE:
-          return process.env.CERTIFICATE_TEMPLATE_ID!;
-        case DocumentTypes.MINISTRY_PLATE:
-          return process.env.PLATE_TEMPLATE_ID!;
-        case DocumentTypes.TRAILER_INTO_SERVICE:
-          return process.env.TRAILER_INTO_SERVICE_TEMPLATE_ID!;
-        case DocumentTypes.TFL_FEED:
-          return process.env.TFL_FEED_TEMPLATE_ID!;
-        default:
-          throw new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST);
-      }
-    }
-  }
+		return this.config.s3[env];
+	}
 
-  /**
-   * Sets the secrets needed to use GovNotify
-   * @returns Promise<void>
-   */
-  private async setSecrets(): Promise<void> {
-    let secretConfig;
+	/**
+	 * Retrieves the MOT config
+	 * @returns INotifyConfig
+	 */
+	public async getNotifyConfig(): Promise<INotifyConfig> {
+		if (!this.config.notify) {
+			throw new Error(ERRORS.NotifyConfigNotDefined);
+		}
+		if (!this.config.notify.api_key) {
+			await this.setSecrets();
+		}
 
-    if (process.env.SECRET_NAME) {
-      const req: GetSecretValueRequest = {
-        SecretId: process.env.SECRET_NAME,
-      };
-      const resp: GetSecretValueResponse = await this.secretsClient.getSecretValue(req).promise();
-      try {
-        secretConfig = safeLoad(resp.SecretString as string);
-      } catch (e) {
-        throw new Error("SecretString is empty.");
-      }
-    } else {
-      console.warn(ERRORS.SECRET_ENV_VAR_NOT_EXIST);
-      try {
-        secretConfig = await yml.read(this.secretPath);
-      } catch (err) {
-        throw new Error(ERRORS.SECRET_FILE_NOT_EXIST);
-      }
-    }
-    try {
-      this.config.notify.api_key = secretConfig.notify.api_key;
-    } catch (e) {
-      throw new Error("secretConfig not set");
-    }
-  }
+		return this.config.notify;
+	}
+
+	/**
+	 * Sets the secrets needed to use GovNotify
+	 * @returns Promise<void>
+	 */
+	private async setSecrets(): Promise<void> {
+		let secretConfig: any;
+
+		if (process.env.SECRET_NAME) {
+			const secretRequest: GetSecretValueCommandInput = {
+				SecretId: process.env.SECRET_NAME,
+			};
+			const resp: GetSecretValueCommandOutput = await this.secretsClient.getSecretValue(secretRequest);
+			try {
+				secretConfig = load(resp.SecretString as string);
+			} catch (e) {
+				throw new Error('SecretString is empty.');
+			}
+		} else {
+			console.warn(ERRORS.SECRET_ENV_VAR_NOT_EXIST);
+			try {
+				secretConfig = await yml.read(this.secretPath);
+			} catch (err) {
+				throw new Error(ERRORS.SECRET_FILE_NOT_EXIST);
+			}
+		}
+		try {
+			this.config.notify.api_key = secretConfig.notify.api_key;
+		} catch (e) {
+			throw new Error('secretConfig not set');
+		}
+	}
 }
 
 export { Configuration };
