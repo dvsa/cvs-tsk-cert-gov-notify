@@ -87,8 +87,6 @@ describe('Emailers', () => {
 			} as unknown as IGetObjectCommandOutput;
 
 			const documentRecord = new CertificateEmail(notificationService);
-			const spy = jest.spyOn(notificationService, 'sendNotification').mockResolvedValue(void 0);
-
 			try {
 				await documentRecord.sendEmail(certificate)
 			} catch (error) {
@@ -142,7 +140,6 @@ describe('Emailers', () => {
 				Body: '1234' as unknown as Buffer,
 			} as unknown as IGetObjectCommandOutput;
 			const documentRecord = new LetterEmail(notificationService);
-			const spy = jest.spyOn(notificationService, 'sendNotification').mockResolvedValue(void 0);
 
 			try {
 				await documentRecord.sendEmail(certificate)
@@ -197,8 +194,6 @@ describe('Emailers', () => {
 				Body: '1234' as unknown as Buffer,
 			} as unknown as IGetObjectCommandOutput;
 			const documentRecord = new PlateEmail(notificationService);
-			const spy = jest.spyOn(notificationService, 'sendNotification').mockResolvedValue(void 0);
-
 			try {
 				await documentRecord.sendEmail(certificate)
 			} catch (error) {
@@ -321,7 +316,6 @@ describe('Emailers', () => {
 				Body: '1234' as unknown as Buffer,
 			} as unknown as IGetObjectCommandOutput;
 			const documentRecord = new TflFeedEmail(notificationService);
-			const spy = jest.spyOn(notificationService, 'sendNotification').mockResolvedValue(void 0);
 
 			try {
 				await documentRecord.sendEmail(certificate)
@@ -414,7 +408,6 @@ describe('Emailers', () => {
 				Body: '1234' as unknown as Buffer,
 			} as unknown as IGetObjectCommandOutput;
 			const documentRecord = new VtgVtpEmail(notificationService);
-			const spy = jest.spyOn(notificationService, 'sendNotification').mockResolvedValue(void 0);
 
 			try {
 				await documentRecord.sendEmail(certificate)

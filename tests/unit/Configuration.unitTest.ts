@@ -3,9 +3,8 @@ import * as fs from 'fs';
 /* eslint-disable jest/no-conditional-expect */
 import { mockClient } from 'aws-sdk-client-mock';
 import { dump } from 'js-yaml';
-
 import { ERRORS } from '../../src/assets/enum';
-import { IConfig, IS3Config } from '../../src/models';
+import { IS3Config } from '../../src/models';
 import { Configuration } from '../../src/utils/Configuration';
 
 describe('Configuration', () => {

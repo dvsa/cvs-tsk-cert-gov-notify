@@ -7,8 +7,6 @@ import sinon from 'sinon';
 import { CertificateDownloadService } from '../../../src/services/CertificateDownloadService';
 import { Configuration } from '../../../src/utils/Configuration';
 import { S3BucketMockService } from '../../models/S3BucketMockService';
-import { S3Client } from '@aws-sdk/client-s3';
-import { S3BucketService } from '../../../src/services/S3BucketService';
 
 describe('CertificateDownloadService', () => {
   const sandbox = sinon.createSandbox();
