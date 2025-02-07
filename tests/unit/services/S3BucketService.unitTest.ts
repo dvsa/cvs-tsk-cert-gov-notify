@@ -16,7 +16,6 @@ describe('S3BucketService', () => {
 	s3BucketService['s3Client'] = mockS3Client;
 
 	describe('download()', () => {
-
 		it('should output log, and send the GetObjectCommand into s3Client.send and return getObjectCommandTesting', async () => {
 			const downloadReturnValue = await s3BucketService.download('fake mock bucket', 'fake mock key');
 

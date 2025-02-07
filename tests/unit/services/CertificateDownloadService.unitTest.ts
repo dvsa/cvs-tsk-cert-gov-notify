@@ -7,6 +7,8 @@ import sinon from 'sinon';
 import { CertificateDownloadService } from '../../../src/services/CertificateDownloadService';
 import { Configuration } from '../../../src/utils/Configuration';
 import { S3BucketMockService } from '../../models/S3BucketMockService';
+import { S3Client } from '@aws-sdk/client-s3';
+import { S3BucketService } from '../../../src/services/S3BucketService';
 
 describe('CertificateDownloadService', () => {
   const sandbox = sinon.createSandbox();
@@ -69,6 +71,39 @@ describe('CertificateDownloadService', () => {
         // @ts-ignore
         expect(e.message).toBe('The specified bucket does not exist.');
       }
+    });
+  });
+  describe('cleanForLogging()', () => {
+    it('Should return original object with redacted true and response not altered', () => {
+      expect((CertificateDownloadService as any).cleanForLogging({
+        Body: {
+          redacted: false,
+        },
+        mockData: 'mock data',
+        $response: undefined,
+      })).
+      toEqual({
+        Body: {
+          redacted: true,
+        },
+        mockData: 'mock data',
+        $response: undefined,
+      });
+    });
+    it('Should return original object with redacted true and response becomes undefined', () => {
+      expect((CertificateDownloadService as any).cleanForLogging({
+        Body: {
+        },
+        mockData: 'mock data',
+        $response: 'has value',
+      })).
+      toEqual({
+        Body: {
+          redacted: true,
+        },
+        mockData: 'mock data',
+        $response: undefined,
+      });
     });
   });
 });

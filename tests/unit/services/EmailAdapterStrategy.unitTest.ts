@@ -6,6 +6,8 @@ import { TflFeedEmail } from "../../../src/emailers/TflFeedEmail";
 import { IGetObjectCommandOutput } from "../../../src/models";
 import { EmailAdapterStrategy } from "../../../src/services/EmailAdapterStrategy";
 import { NotificationService } from "../../../src/services/NotificationService";
+import { AntsFeedEmail } from '../../../src/emailers/AntsFeedEmail';
+import { VtgVtpEmail } from '../../../src/emailers/VtgVtpEmail';
 
 describe('email adapter strategy', () => {
     const notificationService: NotificationService = new NotificationService();
@@ -57,6 +59,42 @@ describe('email adapter strategy', () => {
         const res = emailStrat.getStrategy('VOSA_FILE.csv', certificate);
 
         expect(res).toBeInstanceOf(TflFeedEmail)
+    })
+    it('should identify and return a ants feed email', () => {
+        const certificate: IGetObjectCommandOutput = {
+            Metadata: {
+                'document-type': 'does not matter',
+            },
+        } as unknown as IGetObjectCommandOutput;
+        const emailStrat = new EmailAdapterStrategy(notificationService);
+
+        const res = emailStrat.getStrategy('ANTS_FILE.csv', certificate);
+
+        expect(res).toBeInstanceOf(AntsFeedEmail)
+    })
+    it('should identify and return a VtgVtpEmail feed email', () => {
+        const certificate: IGetObjectCommandOutput = {
+            Metadata: {
+                'cert-type': 'VTG12',
+            },
+        } as unknown as IGetObjectCommandOutput;
+        const emailStrat = new EmailAdapterStrategy(notificationService);
+
+        const res = emailStrat.getStrategy('cert_file.csv', certificate);
+
+        expect(res).toBeInstanceOf(VtgVtpEmail)
+    })
+    it('should identify and return a VtgVtpEmail feed email', () => {
+        const certificate: IGetObjectCommandOutput = {
+            Metadata: {
+                'cert-type': 'VTP12',
+            },
+        } as unknown as IGetObjectCommandOutput;
+        const emailStrat = new EmailAdapterStrategy(notificationService);
+
+        const res = emailStrat.getStrategy('cert_file.csv', certificate);
+
+        expect(res).toBeInstanceOf(VtgVtpEmail)
     })
     it('should throw an error if no email type is found', () => {
         const certificate: IGetObjectCommandOutput = {

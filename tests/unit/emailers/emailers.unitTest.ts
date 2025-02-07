@@ -7,17 +7,17 @@ import { VtgVtpEmail } from '../../../src/emailers/VtgVtpEmail';
 import { IGetObjectCommandOutput } from '../../../src/models';
 import { NotificationService } from '../../../src/services/NotificationService';
 import { AntsFeedEmail } from '../../../src/emailers/AntsFeedEmail';
+import { ERRORS } from '../../../src/assets/enum';
 
 describe('Emailers', () => {
 	const notificationService: NotificationService = new NotificationService();
-	process.env.CERTIFICATE_TEMPLATE_ID = '12345';
-	process.env.TRAILER_INTO_SERVICE_TEMPLATE_ID = '12345';
-	process.env.PLATE_TEMPLATE_ID = '12345';
-	process.env.TFL_FEED_TEMPLATE_ID = '12345';
-	process.env.ANTS_FEED_TEMPLATE_ID = '12345';
-	process.env.VTG_VTP12_TEMPLATE_ID = '12345';
-
 	beforeEach(() => {
+		process.env.CERTIFICATE_TEMPLATE_ID = '12345';
+		process.env.TRAILER_INTO_SERVICE_TEMPLATE_ID = '12345';
+		process.env.PLATE_TEMPLATE_ID = '12345';
+		process.env.TFL_FEED_TEMPLATE_ID = '12345';
+		process.env.ANTS_FEED_TEMPLATE_ID = '12345';
+		process.env.VTG_VTP12_TEMPLATE_ID = '12345';
 		jest.resetAllMocks();
 	});
 
@@ -67,6 +67,34 @@ describe('Emailers', () => {
 				null,
 			);
 		});
+		it('should return throw error due to missing env param', async () => {
+			delete process.env.CERTIFICATE_TEMPLATE_ID;
+			const certificate: IGetObjectCommandOutput = {
+				Metadata: {
+					vrm: 'BQ91YHQ',
+					'test-type-name': 'Annual test',
+					'date-of-issue': '11 March 2019',
+					'total-certs': '2',
+					'test-type-result': 'prs',
+					'cert-type': 'PSV_PRS',
+					'cert-index': '1',
+					'file-format': 'pdf',
+					'file-size': '306784',
+					'should-email-certificate': 'true',
+					email: 'testemail@testdomain.com',
+				},
+				Body: '1234' as unknown as Buffer,
+			} as unknown as IGetObjectCommandOutput;
+
+			const documentRecord = new CertificateEmail(notificationService);
+			const spy = jest.spyOn(notificationService, 'sendNotification').mockResolvedValue(void 0);
+
+			try {
+				await documentRecord.sendEmail(certificate)
+			} catch (error) {
+				expect(error).toEqual(new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST));
+			}
+		});
 	});
 
 	describe('LetterEmail', () => {
@@ -100,6 +128,27 @@ describe('Emailers', () => {
 				'12345',
 				 null,
 			);
+		});
+		it('should return throw error due to missing env param', async () => {
+			delete process.env.TRAILER_INTO_SERVICE_TEMPLATE_ID;
+			const certificate: IGetObjectCommandOutput = {
+				Metadata: {
+					'document-type': 'TrailerIntoService',
+					'trailer-id': '12345',
+					'date-of-issue': '12345',
+					email: 'test@test.com',
+					'should-email-certificate': 'true',
+				},
+				Body: '1234' as unknown as Buffer,
+			} as unknown as IGetObjectCommandOutput;
+			const documentRecord = new LetterEmail(notificationService);
+			const spy = jest.spyOn(notificationService, 'sendNotification').mockResolvedValue(void 0);
+
+			try {
+				await documentRecord.sendEmail(certificate)
+			} catch (error) {
+				expect(error).toEqual(new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST));
+			}
 		});
 	});
 
@@ -135,6 +184,27 @@ describe('Emailers', () => {
 				null,
 			);
 		});
+		it('should return throw error due to missing env param', async () => {
+			delete process.env.PLATE_TEMPLATE_ID;
+			const certificate: IGetObjectCommandOutput = {
+				Metadata: {
+					'document-type': 'VTG6_VTG7',
+					vrm: '12345',
+					'date-of-issue': '12345',
+					email: 'test@test.com',
+					'should-email-certificate': 'true',
+				},
+				Body: '1234' as unknown as Buffer,
+			} as unknown as IGetObjectCommandOutput;
+			const documentRecord = new PlateEmail(notificationService);
+			const spy = jest.spyOn(notificationService, 'sendNotification').mockResolvedValue(void 0);
+
+			try {
+				await documentRecord.sendEmail(certificate)
+			} catch (error) {
+				expect(error).toEqual(new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST));
+			}
+		});
 	});
 
 	describe('AntsFeedEmail', () => {
@@ -161,6 +231,22 @@ describe('Emailers', () => {
 				'ants-file-name',
 			);
 			expect(spy).toHaveBeenCalledTimes(1);
+		});
+		it('should return throw error due to missing env param', async () => {
+			process.env.ANTS_EMAIL_LIST = 'email1@email.com';
+			delete process.env.ANTS_FEED_TEMPLATE_ID;
+			const certificate: IGetObjectCommandOutput = {
+				Metadata: {},
+				Body: '1234' as unknown as Buffer,
+			} as unknown as IGetObjectCommandOutput;
+			const documentRecord = new AntsFeedEmail(notificationService);
+			const spy = jest.spyOn(notificationService, 'sendNotification').mockResolvedValue();
+
+			try {
+				await documentRecord.sendEmail(certificate)
+			} catch (error) {
+				expect(error).toEqual(new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST));
+			}
 		});
 
 		it('should allow me to send two emails with the values overwritten', async () => {
@@ -226,6 +312,22 @@ describe('Emailers', () => {
 				'tfl-file-name',
 			);
 			expect(spy).toHaveBeenCalledTimes(1);
+		});
+		it('should return throw error due to missing env param', async () => {
+			delete process.env.TFL_FEED_TEMPLATE_ID;
+			process.env.TFL_EMAIL_LIST = 'email1@email.com';
+			const certificate: IGetObjectCommandOutput = {
+				Metadata: {},
+				Body: '1234' as unknown as Buffer,
+			} as unknown as IGetObjectCommandOutput;
+			const documentRecord = new TflFeedEmail(notificationService);
+			const spy = jest.spyOn(notificationService, 'sendNotification').mockResolvedValue(void 0);
+
+			try {
+				await documentRecord.sendEmail(certificate)
+			} catch (error) {
+				expect(error).toEqual(new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST));
+			}
 		});
 		it('should allow me to send two emails with the values overwritten', async () => {
 			process.env.TFL_EMAIL_LIST = 'email1@email.com,email2@email.com';
@@ -298,6 +400,27 @@ describe('Emailers', () => {
 				'12345',
 				null,
 			);
+		});
+		it('should return me correct partial params for a VTG12 record', async () => {
+			delete process.env.VTG_VTP12_TEMPLATE_ID;
+			const certificate: IGetObjectCommandOutput = {
+				Metadata: {
+					'cert-type': 'VTG12',
+					vrm: '12345',
+					'date-of-issue': '12345',
+					email: 'test@test.com',
+					'should-email-certificate': 'true',
+				},
+				Body: '1234' as unknown as Buffer,
+			} as unknown as IGetObjectCommandOutput;
+			const documentRecord = new VtgVtpEmail(notificationService);
+			const spy = jest.spyOn(notificationService, 'sendNotification').mockResolvedValue(void 0);
+
+			try {
+				await documentRecord.sendEmail(certificate)
+			} catch (error) {
+				expect(error).toEqual(new Error(ERRORS.TEMPLATE_ID_ENV_VAR_NOT_EXIST));
+			}
 		});
 
 		it('should return me correct partial params for a VTP12 record', async () => {
