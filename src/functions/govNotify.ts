@@ -1,6 +1,7 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import { Handler, SQSBatchItemFailure, SQSBatchResponse, SQSEvent } from 'aws-lambda';
 import 'reflect-metadata';
+import { AxiosError } from 'axios';
 import Container from 'typedi';
 import { ERRORS } from '../assets/enum';
 import { NotificationService } from '../services/NotificationService';
@@ -30,6 +31,11 @@ const govNotify: Handler = async (event: SQSEvent): Promise<SQSBatchResponse> =>
 				await processRequest.process(record);
 			}
 		} catch (error) {
+			const isAxiosError = typeof error === 'object' && error && 'isAxiosError' in error && error.isAxiosError;
+			if (isAxiosError) {
+				console.error('ERROR: Axios response error', (error as AxiosError).response?.data);
+			}
+			console.error(error);
 			console.error(error);
 			batchItemFailures.push({ itemIdentifier: sqsRecord.messageId });
 		}

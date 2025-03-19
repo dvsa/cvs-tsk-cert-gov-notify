@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import { EmailRequestProcessor } from '../../../src/functions/EmailRequestProcessor';
 import { handler } from '../../../src/handler';
 import { NotificationService } from '../../../src/services/NotificationService';
+import { AxiosError } from 'axios';
 
 describe('gov-notify', () => {
 	beforeEach(() => {
@@ -93,4 +94,45 @@ describe('gov-notify', () => {
 		expect(processSpy).toHaveBeenCalledTimes(2);
 		expect(res.batchItemFailures.length).toBe(2);
 	});
+  it('should catch error of type AxiosError without data if it is thrown', async () => {
+    expect.assertions(1);
+    const event = { Records: ['event1'] };
+
+    jest
+      .spyOn(EmailRequestProcessor.prototype, 'getRecordS3Objects')
+      .mockReturnValue([{ event: 's3Record1' }] as unknown as S3EventRecord['s3'][]);
+
+    jest.spyOn(EmailRequestProcessor.prototype, 'process').mockImplementation(() => {
+      const error = new Error('Mock Axios Error') as AxiosError;
+      error.isAxiosError = true;
+      throw error;
+    });
+
+    const consoleSpy = jest.spyOn(console, 'error');
+
+    await handler(event, {} as unknown as Context, () => {});
+
+    expect(consoleSpy).toHaveBeenCalledWith('ERROR: Axios response error', undefined);
+  });
+  it('should catch error of type AxiosError with data if it is thrown', async () => {
+    expect.assertions(1);
+    const event = { Records: ['event1'] };
+
+    jest
+      .spyOn(EmailRequestProcessor.prototype, 'getRecordS3Objects')
+      .mockReturnValue([{ event: 's3Record1' }] as unknown as S3EventRecord['s3'][]);
+
+    jest.spyOn(EmailRequestProcessor.prototype, 'process').mockImplementation(() => {
+      const error = new Error('Mock Axios Error') as AxiosError;
+      error.isAxiosError = true;
+      error.response = { data: "some data", status: 400, statusText: "Bad Request", headers: {}, config: {} } as AxiosError['response'];
+      throw error;
+    });
+
+    const consoleSpy = jest.spyOn(console, 'error');
+
+    await handler(event, {} as unknown as Context, () => {});
+
+    expect(consoleSpy).toHaveBeenCalledWith('ERROR: Axios response error', "some data");
+  });
 });
